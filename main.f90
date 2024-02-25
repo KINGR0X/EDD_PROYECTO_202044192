@@ -1,10 +1,15 @@
 program main
-    use cola_recepcion
-
     use json_module
+
+    use cola_recepcion
+    use List_of_list_vent
+
+    
     implicit none
 
     type(cola) :: cola_recep
+    type(List_of_list) :: list_ventanillas
+
 
     ! Lo que se va a usar para leer el Json
     type(json_file) :: json   ! Variable de tipo json_file
@@ -18,6 +23,7 @@ program main
     ! ===============================
     integer :: opcion
     integer:: c_ventanillas
+    character(len=10) :: ventanilla_name
 
     ! Ciclo para el menú
     do
@@ -62,6 +68,16 @@ program main
                 print *, " "
                 print *, "=== Ingrese la cantidad de ventanillas ==="
                 read(*, *) c_ventanillas
+
+                ! Creación de ventanillas segun la cantidad ingresada
+                do i = 1, c_ventanillas
+                    call list_ventanillas%insert(i,'vacio')
+                    ! cada ventanilla tiene su propia pila
+
+                    ! Pop usado para edjar la pila vacia
+                    call list_ventanillas%popAtIndex(i)
+                    call list_ventanillas%popAtIndex(i)
+                end do
                 
             case(2)
                 print *, "Ejecutar paso"
@@ -69,6 +85,9 @@ program main
             case(3)
                 print *, "Estado en memoria de las estructuras"
                 call cola_recep%print()
+                print *, " "
+                print *, "Lista ventanillas: "
+                call list_ventanillas%printList()
             case(4)
                 print *, "Reportes"
             case(5)
