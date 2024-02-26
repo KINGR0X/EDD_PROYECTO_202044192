@@ -3,7 +3,6 @@ program main
 
     use cola_recepcion
     use List_of_list_vent
-
     
     implicit none
 
@@ -82,6 +81,8 @@ program main
                 
             case(2)
                 print *, "Ejecutar paso"
+                ! Primero se verifica si hay clientes en la cola de recepcion para evitar que en el primer paso se asigne cliente y agrege una imegen
+                call list_ventanillas%imagenes_a_ventanilla()
                 call cliente_a_ventanilla()
 
             case(3)
@@ -90,8 +91,9 @@ program main
                 print *, " "
                 print *, "Lista ventanillas: "
                 call list_ventanillas%printList()
+                
             case(4)
-                print *, "Reportes"
+                print *, "Reportes"   
             case(5)
                 print *, "Nombre: Elian Angel Fernando Reyes Yac"
                 print *, "Carnet: 202044192"
@@ -144,7 +146,6 @@ contains
             print *, 'No se encontraron nodos desocupados.'    
         end if
 
-    
     end subroutine cliente_a_ventanilla
 
 end program main

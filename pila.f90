@@ -65,3 +65,24 @@ contains
     end subroutine print
     
 end module pila_module
+
+! program main
+!     use pila_module
+!     implicit none
+
+!     type(pila) :: p
+!     integer :: i
+
+!     do i = 1, 10
+!         call p%push(i)
+!     end do
+
+!     call p%print
+
+!     do i = 1, 5
+!         call p%pop
+!     end do
+
+!     call p%print
+
+! end program main

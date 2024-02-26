@@ -33,9 +33,39 @@ module List_of_list_vent
         procedure :: popAtIndex
         procedure :: asignar_datos_cliente
         procedure :: buscar_nodo_desocupado
+        procedure :: imagenes_a_ventanilla
     end type List_of_list
 
 contains
+
+    subroutine imagenes_a_ventanilla(self)
+        class(List_of_list), intent(inout) :: self
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%ocupado .and. current%num_imgG > 0) then
+                ! Agregar una imagen grande
+                call self%insert(current%index, 'imagen Grande')
+                ! Decrementar el contador de imágenes grandes
+                current%num_imgG = current%num_imgG - 1
+
+            else if (current%ocupado .and. current%num_imgP > 0) then
+                ! Agregar una imagen grande
+                call self%insert(current%index, 'imagen Pequena')
+                ! Decrementar el contador de imágenes grandes
+                current%num_imgP = current%num_imgP - 1
+            end if
+            current => current%next
+        end do
+
+        ! Si no se encontró ningún nodo ocupado con imágenes grandes, se imprime un mensaje.
+        print *, 'Se han agregado imágenes grandes a todos los nodos ocupados en la lista.'
+    end subroutine imagenes_a_ventanilla
+
+
+
 
     subroutine insert(self, index, value)
         class(List_of_list), intent(inout) :: self
@@ -235,18 +265,17 @@ end module List_of_list_vent
 !     implicit none
 
 !     type(List_of_list) :: list
-!     call list%insert(1, 'inicio')
 
-!     call list%insert(1, 'adios')
+!     call list%insert(1, 'primero')
 !     call list%insert(2, 'hola2')
-!     call list%insert(2, 'adios2')
-!     call list%insert(3, 'hola4')
-!     call list%insert(3, 'adios4')
-!     call list%insert(2, 'hola3')
+!     ! call list%insert(2, 'adios2')
+!     ! call list%insert(3, 'hola4')
+!     ! call list%insert(3, 'adios4')
+!     ! call list%insert(2, 'hola3')
 
-!     call list%insert(1,'bye')
+!     ! call list%insert(1,'bye')
 
-!     call list%printList()
+!     ! call list%printList()
 
 !     ! call list%printPunteros()
 !     ! print *, ""
@@ -257,7 +286,18 @@ end module List_of_list_vent
 !     ! call list%printPunteros()
 !     ! call list%printList()
 
-!     call list%asignar_datos_cliente(1, 'Cliente1',5, 10)
+!     call list%asignar_datos_cliente(1, 'Cliente1',2, 1)
+!     call list%asignar_datos_cliente(2, 'Cliente2',3, 3)
+
 !     call list%printList()
+
+!     print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+!     call list%imagenes_a_ventanilla()
+!     call list%imagenes_a_ventanilla()
+!     call list%imagenes_a_ventanilla()
+!     call list%imagenes_a_ventanilla()
+
+!     call list%printList()
+
 
 ! end program main
