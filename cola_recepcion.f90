@@ -4,7 +4,8 @@ module cola_recepcion
 
     type, public :: node
         private
-        character(:), allocatable :: value,img_g, img_p
+        character(:), allocatable :: value
+        integer :: img_g, img_p
         type(node), pointer :: next     
     end type node
 
@@ -16,13 +17,17 @@ module cola_recepcion
         procedure :: append
         procedure :: delete
         procedure :: print
+        procedure :: return_cliente_name
+        procedure :: return_cliente_img_g
+        procedure :: return_cliente_img_p
     end type cola
 
 contains
 
     subroutine append(this, value, img_g, img_p)
         class(cola), intent(inout) :: this
-        character(len=*), intent(in) :: value,img_g, img_p
+        character(len=*), intent(in) :: value
+        integer, intent(in) :: img_g, img_p
 
         type(node), pointer :: temp
         allocate(temp)
@@ -77,4 +82,58 @@ contains
         end do 
     end subroutine print
 
+    function return_cliente_name(this) result(head_value)
+        class(cola), intent(in) :: this
+        character(len=:), allocatable :: head_value
+
+        if (.not. associated(this%head)) then
+            print *, 'Cola esta vacia'
+            head_value = ""
+        else
+            head_value = this%head%value
+        end if
+    end function return_cliente_name
+
+    function return_cliente_img_g(this) result(img_g)
+        class(cola), intent(in) :: this
+        integer :: img_g
+
+        if (.not. associated(this%head)) then
+            print *, 'Cola esta vacia'
+            img_g = 0
+        else
+            img_g = this%head%img_g
+        end if
+    end function return_cliente_img_g
+
+    function return_cliente_img_p(this) result(img_p)
+        class(cola), intent(in) :: this
+        integer :: img_p
+
+        if (.not. associated(this%head)) then
+            print *, 'Cola esta vacia'
+            img_p = 0
+        else
+            img_p = this%head%img_p
+        end if
+    end function  return_cliente_img_p
+
 end module cola_recepcion
+
+! program main
+!     use cola_recepcion
+!     implicit none
+
+!     type(cola) :: cola_r
+!     character(len=:), allocatable :: nombre_cliente
+    
+!     call cola_r%append("Juan", 1, 2)
+
+!     call cola_r%print()
+
+!     nombre_cliente = cola_r%return_cliente_name()
+
+!     print *, "Nombre del cliente: ", nombre_cliente
+
+
+! end program main

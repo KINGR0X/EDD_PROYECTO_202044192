@@ -15,7 +15,8 @@ program main
     type(json_file) :: json   ! Variable de tipo json_file
     type(json_value), pointer :: listPointer, personPointer, img_g_pointer,img_p_pointer, attributePointer  ! punteros
     type(json_core) :: jsonc  ! Se declara una variable del tipo json_core para acceder a las funciones básicas de JSON
-    character(:), allocatable :: nombre,img_g,img_p  ! Se declara una cadena de caracteres que se asignará dinámicamente
+    character(:), allocatable :: nombre
+    integer :: img_g,img_p
     character(len=100) :: filename
     integer :: i, size       
     logical :: found
@@ -81,6 +82,7 @@ program main
                 
             case(2)
                 print *, "Ejecutar paso"
+                call cliente_a_ventanilla()
 
             case(3)
                 print *, "Estado en memoria de las estructuras"
@@ -116,7 +118,34 @@ contains
         print *, "=============================="
     end subroutine mostrarMenu
 
+    !subroutine para asignar cliente a ventanilla
+    subroutine cliente_a_ventanilla()
+        !Primero la cola de recepcion devuelve los valores del primer cliente y se guardan en variables temporales
+        character(len=:), allocatable:: cliente_temp
+        integer:: img_g_temp
+        integer:: img_p_temp
+        integer:: ventanilla_desocupada
 
+        cliente_temp= cola_recep%return_cliente_name()
+        img_g_temp= cola_recep%return_cliente_img_g()
+        img_p_temp= cola_recep%return_cliente_img_p()
+
+
+        ! Encontrar el primer nodo desocupado
+        ventanilla_desocupada = list_ventanillas%buscar_nodo_desocupado()
+        
+        ! Imprimir el resultado
+        if (ventanilla_desocupada > 0) then
+            print *, 'El primer nodo desocupado tiene el índice:', ventanilla_desocupada
+            call list_ventanillas%asignar_datos_cliente(ventanilla_desocupada, cliente_temp,img_g_temp, img_p_temp)
+            !Se elimina el primer nodo de la cola de recepcion, solo si una ventanilla esta disponible
+            call cola_recep%delete()
+        else
+            print *, 'No se encontraron nodos desocupados.'    
+        end if
+
+    
+    end subroutine cliente_a_ventanilla
 
 end program main
 

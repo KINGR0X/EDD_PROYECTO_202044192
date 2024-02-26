@@ -9,8 +9,11 @@ module List_of_list_vent
 
     type :: node
         integer :: index
+        integer :: num_imgG=0
+        integer :: num_imgP=0
+        character(:), allocatable :: name_client
+        logical :: ocupado = .false.
         type(node), pointer :: next => null()
-        type(node), pointer :: prev => null()
         type(sub_node), pointer :: stack => null() ! pila
         
     contains
@@ -28,6 +31,8 @@ module List_of_list_vent
         procedure :: printList
         procedure :: printPunteros
         procedure :: popAtIndex
+        procedure :: asignar_datos_cliente
+        procedure :: buscar_nodo_desocupado
     end type List_of_list
 
 contains
@@ -38,59 +43,35 @@ contains
         integer, intent(in) :: index
 
         type(node), pointer :: aux
-        type(node), pointer :: new
-        allocate(new)
+        type(sub_node), pointer :: new_subnode
+        allocate(new_subnode)
+        new_subnode%value = value
 
-        if(.not. associated(self%head)) then
+        if (.not. associated(self%head)) then
             allocate(aux)
             aux%index = index
             self%head => aux
             self%tail => aux
-            call aux%append(value)
+            aux%stack => new_subnode
         else
-            if(index < self%head%index) then
-                self%head%prev => new
-                new%next => self%head
-                self%head => new
-
-                new%index = index
-                call new%append(value)
-            else
-                aux => self%head
-                do while (associated(aux%next))
-                    if(index < aux%next%index) then
-                        if(index == aux%index) then
-                            call aux%append(value)
-                        else
-                            new%next => aux%next
-                            new%prev => aux
-                            aux%next%prev => new
-                            aux%next => new
-
-                            new%index = index
-                            call new%append(value)
-                        end if
-                        return
-                    end if
-                    aux => aux%next
-                end do
-
-                if(index == aux%index) then
-                    call aux%append(value)
-                else
-                    self%tail%next => new
-                    new%prev => self%tail
-                    self%tail => new
-
-                    new%index = index
-                    call new%append(value)
+            aux => self%head
+            do while (associated(aux%next))
+                if (index == aux%index) then
+                    call aux%push(value)
+                    return
                 end if
-            end if
-        end if
+                aux => aux%next
+            end do
 
-        ! null
-        if(associated(new%next)) then
-            new%next => null()
+            if (index == aux%index) then
+                call aux%push(value)
+                return
+            end if
+
+            allocate(aux%next)
+            aux%next%index = index
+            aux%next%stack => new_subnode
+            self%tail => aux%next
         end if
     end subroutine insert
 
@@ -102,11 +83,33 @@ contains
 
         do while(associated(aux))
             print *, 'Indice: ', aux%index
+            print *, 'Nombre del cliente: ', aux%name_client
+            print *, 'Numero de imagenes grandes: ', aux%num_imgG
+            print *, 'Numero de imagenes pequeñas: ', aux%num_imgP
             call aux%print()
             print *, ""
             aux => aux%next
         end do
     end subroutine printList
+
+    function buscar_nodo_desocupado(self) result(index)
+        class(List_of_list), intent(in) :: self
+        integer :: index
+        
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (.not. current%ocupado) then
+                index = current%index
+                return
+            end if
+            current => current%next
+        end do
+
+        ! Si no se encuentra ningún nodo desocupado, devolvemos -1
+        index = -1
+    end function buscar_nodo_desocupado
 
     subroutine printPunteros(self)
         class(List_of_list) :: self
@@ -118,7 +121,6 @@ contains
             print *, 'Indice: ', aux%index
             call aux%print()
             print *, "El nodo siguiente es:", aux%next%index
-            print *, "El nodo anterior es:", aux%prev%index
             print *, ""
             aux => aux%next
         end do
@@ -129,13 +131,13 @@ contains
         class(node), intent(inout) :: self
         character(len=*), intent(in) :: string
 
-        type(sub_node), pointer :: new
-        allocate(new)
-        new%value = string
+        type(sub_node), pointer :: new_subnode
+        allocate(new_subnode)
+        new_subnode%value = string
 
         ! Agregar al principio de la pila
-        new%next => self%stack
-        self%stack => new
+        new_subnode%next => self%stack
+        self%stack => new_subnode
     end subroutine append
 
     subroutine push(this, value)
@@ -194,6 +196,38 @@ contains
             current => current%next
         end do
     end subroutine print
+
+    subroutine asignar_datos_cliente(self, index, name_client,num_imgG, num_imgP)
+        class(List_of_list), intent(inout) :: self
+        integer, intent(in) :: index
+        integer, intent(in) :: num_imgG
+        integer, intent(in) :: num_imgP
+        character(len=*), intent(in) :: name_client
+        
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%index == index) then
+                current%num_imgG = num_imgG
+                current%num_imgP = num_imgP
+                current%name_client = name_client
+
+                if (len_trim(name_client) > 0) then
+                    current%ocupado = .true.
+                else
+                    current%ocupado = .false.
+                end if
+
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, 'El índice especificado no se encontró en la lista.'
+    end subroutine asignar_datos_cliente
+
 end module List_of_list_vent
 
 ! program main
@@ -202,23 +236,28 @@ end module List_of_list_vent
 
 !     type(List_of_list) :: list
 !     call list%insert(1, 'inicio')
+
 !     call list%insert(1, 'adios')
 !     call list%insert(2, 'hola2')
 !     call list%insert(2, 'adios2')
-!     call list%insert(4, 'hola4')
-!     call list%insert(4, 'adios4')
-!     call list%insert(3, 'hola3')
+!     call list%insert(3, 'hola4')
+!     call list%insert(3, 'adios4')
+!     call list%insert(2, 'hola3')
 
 !     call list%insert(1,'bye')
 
 !     call list%printList()
 
-!     call list%printPunteros()
-!     print *, ""
+!     ! call list%printPunteros()
+!     ! print *, ""
 
-!     ! pop 
-!     call list%popAtIndex(1)
+!     ! ! pop 
+!     ! call list%popAtIndex(1)
+
+!     ! call list%printPunteros()
+!     ! call list%printList()
+
+!     call list%asignar_datos_cliente(1, 'Cliente1',5, 10)
 !     call list%printList()
-
 
 ! end program main
