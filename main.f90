@@ -3,11 +3,16 @@ program main
 
     use cola_recepcion
     use List_of_list_vent
+    use cola_impresion
     
     implicit none
 
     type(cola) :: cola_recep
     type(List_of_list) :: list_ventanillas
+
+    !colas de impresion (impresoras)
+    type(cola_im) :: cola_img_grande
+    type(cola_im) :: cola_img_pequena
 
 
     ! Lo que se va a usar para leer el Json
@@ -24,6 +29,8 @@ program main
     integer :: opcion
     integer:: c_ventanillas
     character(len=10) :: ventanilla_name
+
+    character(len=:), allocatable :: valor_eliminado
 
     ! Ciclo para el menú
     do
@@ -75,8 +82,8 @@ program main
                     ! cada ventanilla tiene su propia pila
 
                     ! Pop usado para edjar la pila vacia
-                    call list_ventanillas%popAtIndex(i)
-                    call list_ventanillas%popAtIndex(i)
+                    call list_ventanillas%pop_inicial(i)
+                    call list_ventanillas%pop_inicial(i)
                 end do
                 
             case(2)
@@ -84,6 +91,7 @@ program main
                 ! Primero se verifica si hay clientes en la cola de recepcion para evitar que en el primer paso se asigne cliente y agrege una imegen
                 call list_ventanillas%imagenes_a_ventanilla()
                 call cliente_a_ventanilla()
+                call img_a_impresora()
 
             case(3)
                 print *, "Estado en memoria de las estructuras"
@@ -147,6 +155,30 @@ contains
         end if
 
     end subroutine cliente_a_ventanilla
+
+    subroutine img_a_impresora()
+        integer:: x
+        logical :: pila_llena_ventanilla
+        pila_llena_ventanilla= .false.
+
+        ! Ciclo para verificar si el nodo está ocupado
+        do x=1,c_ventanillas
+            pila_llena_ventanilla= list_ventanillas%verificar_nodo(x)
+
+            if (pila_llena_ventanilla) then
+                !Ciclo usando check_stack_size para eliminar todos los elementos de la pila
+                do while (list_ventanillas%check_stack_size(x)>0)
+                    valor_eliminado = list_ventanillas%popAtIndex(x)
+                    print *, "Valor eliminado: ", valor_eliminado
+                end do
+            end if
+
+        end do
+
+        
+
+    
+    end subroutine img_a_impresora
 
 end program main
 

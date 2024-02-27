@@ -54,11 +54,11 @@ contains
         type(node), pointer :: temp
 
         if (.not. associated(this%head)) then
-            print *, 'Cola esta vacia'
+            print *, 'Cola recepcion esta vacia'
             return
         end if
 
-        print *, 'Delete ', this%head%value
+        print *, 'Cliente eliminado de cola de recepcion: ', this%head%value
         temp => this%head
         this%head => this%head%next
         deallocate(temp)

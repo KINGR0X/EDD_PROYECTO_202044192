@@ -21,6 +21,7 @@ module List_of_list_vent
         procedure :: push
         procedure :: pop
         procedure :: print
+        procedure :: pop_normal
     end type node
 
     type, public :: List_of_list
@@ -34,9 +35,80 @@ module List_of_list_vent
         procedure :: asignar_datos_cliente
         procedure :: buscar_nodo_desocupado
         procedure :: imagenes_a_ventanilla
+        procedure :: check_stack_size
+        procedure :: verificar_nodo
+        procedure :: pop_inicial
     end type List_of_list
 
 contains
+
+    function verificar_nodo(self, index) result(pila_llena)
+        class(List_of_list), intent(inout) :: self
+        integer, intent(in) :: index
+        logical :: pila_llena
+
+        type(node), pointer :: current
+        current => self%head
+
+        pila_llena = .false.
+
+        do while (associated(current))
+            if (current%index == index) then
+                if (current%ocupado) then
+                    if (current%num_imgG == 0 .and. current%num_imgP == 0) then
+                        if (self%check_stack_size(index)>0) then
+                            current%ocupado = .false.
+                            pila_llena = .true.
+                            print *, 'El nodo ', index, ' tiene la pila llena.'
+                            print *, 'Ocupado:', current%ocupado
+                        end if
+                    else
+                        print *, 'El nodo ', index, ' tiene imágenes por agregar'
+                        print *, 'Número de imágenes grandes: ', current%num_imgG
+                        print *, 'Número de imágenes pequeñas: ', current%num_imgP
+                        pila_llena = .false.
+                    end if
+                end if
+                exit
+            end if
+            current => current%next
+        end do
+    end function verificar_nodo
+
+
+    function check_stack_size(self, index) result(size_p)
+        class(List_of_list), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: stack_size
+        integer :: size_p
+        type(sub_node), pointer :: temp
+
+        type(node), pointer :: current
+        current => self%head
+
+        size_p = 0
+
+        do while (associated(current))
+            if (current%index == index) then
+                if (associated(current%stack)) then
+                    ! Calcular el tamaño de la pila
+                    temp => current%stack
+                    stack_size = 0
+                    do while (associated(temp))
+                        stack_size = stack_size + 1
+                        temp => temp%next
+                    end do
+
+                    ! Verificar si el tamaño de la pila es mayor a 0
+                    if (stack_size > 0) then
+                        size_p= stack_size
+                    end if
+                end if
+                exit
+            end if
+            current => current%next
+        end do
+    end function check_stack_size
 
     subroutine imagenes_a_ventanilla(self)
         class(List_of_list), intent(inout) :: self
@@ -177,8 +249,9 @@ contains
         call this%append(value)
     end subroutine push
 
-    subroutine pop(this)
+    function pop(this) result(return_value)
         class(node), intent(inout) :: this
+        character(:), allocatable :: return_value
 
         type(sub_node), pointer :: temp
 
@@ -189,13 +262,49 @@ contains
 
         temp => this%stack
         this%stack => this%stack%next
-
+        return_value = temp%value
         print *, '******** Pop:', temp%value, " ********"
 
         deallocate(temp)
-    end subroutine pop
+    end function pop
 
-    subroutine popAtIndex(self, index)
+    function popAtIndex(self, index) result(value_delete)
+        class(List_of_list), intent(inout) :: self
+        integer, intent(in) :: index
+        character(:), allocatable :: value_delete
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%index == index) then
+                value_delete= current%pop()
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, 'El índice especificado no se encontró en la lista.'
+    end function popAtIndex
+
+    subroutine pop_normal(this)
+        class(node), intent(inout) :: this
+
+        type(sub_node), pointer :: temp
+
+        if (.not. associated(this%stack)) then
+            ! print *, 'La pila está vacía.'
+            return
+        end if
+
+        temp => this%stack
+        this%stack => this%stack%next
+        ! print *, '******** Pop:', temp%value, " ********"
+
+        deallocate(temp)
+    end subroutine pop_normal
+
+    subroutine pop_inicial(self, index)
         class(List_of_list), intent(inout) :: self
         integer, intent(in) :: index
 
@@ -204,14 +313,14 @@ contains
 
         do while (associated(current))
             if (current%index == index) then
-                call current%pop()
+                call current%pop_normal()
                 return
             end if
             current => current%next
         end do
 
         print *, 'El índice especificado no se encontró en la lista.'
-    end subroutine popAtIndex
+    end subroutine pop_inicial
 
     subroutine print(self)
         class(node), intent(inout) :: self
@@ -265,6 +374,12 @@ end module List_of_list_vent
 !     implicit none
 
 !     type(List_of_list) :: list
+!     integer:: i,num_ventanillas
+!     character(len=:), allocatable :: valor_eliminado
+!     logical :: pila_llena_ventanilla
+
+!     num_ventanillas = 2
+!     pila_llena_ventanilla= .false.
 
 !     call list%insert(1, 'primero')
 !     call list%insert(2, 'hola2')
@@ -280,8 +395,7 @@ end module List_of_list_vent
 !     ! call list%printPunteros()
 !     ! print *, ""
 
-!     ! ! pop 
-!     ! call list%popAtIndex(1)
+!     call list%printList()
 
 !     ! call list%printPunteros()
 !     ! call list%printList()
@@ -291,13 +405,26 @@ end module List_of_list_vent
 
 !     call list%printList()
 
-!     print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-!     call list%imagenes_a_ventanilla()
+!     ! print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 !     call list%imagenes_a_ventanilla()
 !     call list%imagenes_a_ventanilla()
 !     call list%imagenes_a_ventanilla()
 
 !     call list%printList()
+
+!     ! Ciclo para verificar si el nodo está ocupado
+!     do i=1,num_ventanillas
+!         pila_llena_ventanilla=list%verificar_nodo(i)
+
+!         if (pila_llena_ventanilla) then
+!             !Ciclo usando check_stack_size para eliminar todos los elementos de la pila
+!             do while (list%check_stack_size(i)>0)
+!                 valor_eliminado = list%popAtIndex(i)
+!                 print *, "Valor eliminado: ", valor_eliminado
+!             end do
+!         end if
+
+!     end do
 
 
 ! end program main
