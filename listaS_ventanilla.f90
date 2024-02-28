@@ -119,13 +119,13 @@ contains
         do while (associated(current))
             if (current%ocupado .and. current%num_imgG > 0) then
                 ! Agregar una imagen grande
-                call self%insert(current%index, 'imagen Grande')
+                call self%insert(current%index, 'Imagen Grande')
                 ! Decrementar el contador de imágenes grandes
                 current%num_imgG = current%num_imgG - 1
 
             else if (current%ocupado .and. current%num_imgP > 0) then
                 ! Agregar una imagen grande
-                call self%insert(current%index, 'imagen Pequena')
+                call self%insert(current%index, 'Imagen Pequena')
                 ! Decrementar el contador de imágenes grandes
                 current%num_imgP = current%num_imgP - 1
             end if

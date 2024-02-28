@@ -99,6 +99,9 @@ program main
                 print *, " "
                 print *, "Lista ventanillas: "
                 call list_ventanillas%printList()
+                print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXX COLAS DE IMPRESION XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                call cola_img_grande%print()
+                call cola_img_pequena%print()
                 
             case(4)
                 print *, "Reportes"   
@@ -169,7 +172,15 @@ contains
                 !Ciclo usando check_stack_size para eliminar todos los elementos de la pila
                 do while (list_ventanillas%check_stack_size(x)>0)
                     valor_eliminado = list_ventanillas%popAtIndex(x)
-                    print *, "Valor eliminado: ", valor_eliminado
+
+                    ! Se revisa si el valor_elimiado es igual a "Imagen Grande"
+                    if (valor_eliminado == "Imagen Grande") then
+                        call cola_img_grande%append(valor_eliminado)
+                        print *, "Valor eliminado: ", valor_eliminado
+                    else
+                        call cola_img_pequena%append(valor_eliminado)
+                        print *, "Valor eliminado: ", valor_eliminado
+                    end if
                 end do
             end if
 
@@ -181,7 +192,3 @@ contains
     end subroutine img_a_impresora
 
 end program main
-
-
-
-

@@ -2,16 +2,16 @@ module cola_impresion
     implicit none
     private
 
-    type, public :: node
+    type, public :: node_im
         private
         character(:), allocatable :: value
-        type(node), pointer :: next     
-    end type node
+        type(node_im), pointer :: next     
+    end type node_im
 
     type, public :: cola_im
         private
-        type(node), pointer :: head => null()
-        type(node), pointer :: end => null()
+        type(node_im), pointer :: head => null()
+        type(node_im), pointer :: end => null()
     contains
         procedure :: append
         procedure :: delete
@@ -25,7 +25,7 @@ contains
         class(cola_im), intent(inout) :: this
         character(len=*), intent(in) :: value
 
-        type(node), pointer :: temp
+        type(node_im), pointer :: temp
         allocate(temp)
         temp%value = value
         temp%next => null()
@@ -45,7 +45,7 @@ contains
 
     subroutine delete(this)
         class(cola_im), intent(inout) :: this
-        type(node), pointer :: temp
+        type(node_im), pointer :: temp
 
         if (.not. associated(this%head)) then
             print *, 'Cola esta vacia'
@@ -60,23 +60,21 @@ contains
 
     subroutine print(this)
         class(cola_im), intent(in) :: this
-        type(node), pointer :: current
+        type(node_im), pointer :: current
 
         current => this%head
 
-        print *, '-------- Cola de Recepcion --------'
-        print *,  " "
+        print *, '-------- Cola de impresion --------'
 
         do while (associated(current))
             print *, current%value
-            print *, "---------------"
             current => current%next
         end do 
     end subroutine print
 
     function size_cola(this) result(size)
         class(cola_im), intent(in) :: this
-        type(node), pointer :: current
+        type(node_im), pointer :: current
         integer :: size
 
         current => this%head
