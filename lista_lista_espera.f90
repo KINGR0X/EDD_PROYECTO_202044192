@@ -1,4 +1,4 @@
-module linked_list_module
+module lista_clientes_espera
     implicit none
     private
 
@@ -10,8 +10,8 @@ module linked_list_module
     type, public :: node
         private
         integer :: value
-        character(:), allocatable :: name_cliente, name_ventanilla
-        integer :: img_g, img_p, total_pasos
+        character(:), allocatable :: name_cliente
+        integer :: img_g, img_p, total_pasos, num_ventanilla
         type(sub_node), pointer :: stack => null() ! Pila asociada al nodo
         type(node), pointer :: next => null()
         type(node), pointer :: prev => null()
@@ -22,7 +22,7 @@ module linked_list_module
     end type node
 
     ! Lista circular
-    type, public :: linked_list
+    type, public :: lista_circular
         private
         type(node), pointer :: head => null()
         type(node), pointer :: tail => null()
@@ -31,15 +31,15 @@ module linked_list_module
         procedure :: print
         procedure :: delete
         procedure :: push_to_stack
-    end type linked_list
+    end type lista_circular
 
 contains
 
-    subroutine append(self, value, name_cliente, name_ventanilla, img_g, img_p, total_pasos)
-        class(linked_list), intent(inout) :: self
+    subroutine append(self, value, name_cliente, num_ventanilla, img_g, img_p, total_pasos)
+        class(lista_circular), intent(inout) :: self
         integer, intent(in) :: value
-        character(len=*), intent(in) :: name_cliente, name_ventanilla
-        integer, intent(in) :: img_g, img_p, total_pasos
+        character(len=*), intent(in) :: name_cliente
+        integer, intent(in) :: img_g, img_p, total_pasos, num_ventanilla
 
         type(node), pointer :: new
         type(sub_node), pointer :: new_subnode
@@ -50,7 +50,7 @@ contains
 
         new%value = value
         new%name_cliente = name_cliente
-        new%name_ventanilla = name_ventanilla
+        new%num_ventanilla = num_ventanilla
         new%img_g = img_g
         new%img_p = img_p
         new%total_pasos = total_pasos
@@ -79,7 +79,7 @@ contains
 
 
     subroutine print(self)
-        class(linked_list), intent(inout) :: self
+        class(lista_circular), intent(inout) :: self
         type(node), pointer :: current
 
         if (.not. associated(self%head)) then
@@ -90,9 +90,9 @@ contains
         current => self%head
 
         do while (associated(current))
-            print *, 'Value:', current%value
+            print *, 'Index nodo:', current%value
             print *, 'Name Cliente:', current%name_cliente
-            print *, 'Name Ventanilla:', current%name_ventanilla
+            print *, 'Numero Ventanilla:', current%num_ventanilla
             print *, 'Imagen G:', current%img_g
             print *, 'Imagen P:', current%img_p
             print *, 'Total Pasos:', current%total_pasos
@@ -113,7 +113,7 @@ contains
     end subroutine print_stack
 
     subroutine delete(self, value)
-        class(linked_list), intent(inout) :: self
+        class(lista_circular), intent(inout) :: self
         integer, intent(in) :: value
         type(node), pointer :: current, previous, new_tail
 
@@ -181,7 +181,7 @@ contains
     end subroutine append_to_stack
 
     subroutine push_to_stack(self, index, value)
-        class(linked_list), intent(inout) :: self
+        class(lista_circular), intent(inout) :: self
         integer, intent(in) :: index
         character(len=*), intent(in) :: value
         
@@ -199,37 +199,34 @@ contains
         print *, "El índice especificado no se encontró en la lista."
     end subroutine push_to_stack
 
+end module lista_clientes_espera
 
-
-
-end module linked_list_module
-
-program main
-    use linked_list_module
-    implicit none
+! program main
+!     use lista_clientes_espera
+!     implicit none
     
-    type(linked_list) :: list
+!     type(lista_circular) :: list
 
-    ! Agregar nodos a la lista
-    call list%append(1, "Cliente1", "Ventanilla1", 2, 1, 6)
-    call list%append(2, "Cliente2", "Ventanilla2", 3, 3, 7)
-    call list%append(3, "Cliente3", "Ventanilla3", 4, 2, 8)
+!     ! Agregar nodos a la lista
+!     call list%append(1, "Cliente1", "Ventanilla1", 2, 1, 6)
+!     call list%append(2, "Cliente2", "Ventanilla2", 3, 3, 7)
+!     call list%append(3, "Cliente3", "Ventanilla3", 4, 2, 8)
 
-    call list%push_to_stack(1, 'valor1') ! Agrega el valor 'valor1' a la pila del nodo con índice 1
-    call list%push_to_stack(2, 'valor2') ! Agrega el valor 'valor2' a la pila del nodo con índice 2
-    call list%push_to_stack(2, 'valor3') ! Agrega el valor 'valor3' a la pila del nodo con índice 2
-    call list%push_to_stack(2, 'valor4') ! Agrega el valor 'valor4' a la pila del nodo con índice 3
-
-
-    ! Imprimir la lista
-    call list%print()
+!     call list%push_to_stack(1, 'valor1') ! Agrega el valor 'valor1' a la pila del nodo con índice 1
+!     call list%push_to_stack(2, 'valor2') ! Agrega el valor 'valor2' a la pila del nodo con índice 2
+!     call list%push_to_stack(2, 'valor3') ! Agrega el valor 'valor3' a la pila del nodo con índice 2
+!     call list%push_to_stack(2, 'valor4') ! Agrega el valor 'valor4' a la pila del nodo con índice 3
 
 
+!     ! Imprimir la lista
+!     call list%print()
 
-    ! Eliminar un nodo de la lista
-    print *, " "
-    ! call list%delete(2)
 
-    ! ! Imprimir la lista después de la eliminación
-    ! call list%print()
-end program main
+
+!     ! Eliminar un nodo de la lista
+!     print *, " "
+!     ! call list%delete(2)
+
+!     ! ! Imprimir la lista después de la eliminación
+!     ! call list%print()
+! end program main

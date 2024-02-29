@@ -11,6 +11,8 @@ module List_of_list_vent
         integer :: index
         integer :: num_imgG=0
         integer :: num_imgP=0
+        integer :: num_imgG_original=0
+        integer :: num_imgP_original=0
         character(:), allocatable :: name_client
         logical :: ocupado = .false.
         type(node), pointer :: next => null()
@@ -38,9 +40,89 @@ module List_of_list_vent
         procedure :: check_stack_size
         procedure :: verificar_nodo
         procedure :: pop_inicial
+        procedure :: return_nombre_cliente
+        procedure :: return_num_ventanilla
+        procedure :: return_num_imgG
+        procedure :: return_num_imgP
     end type List_of_list
 
 contains
+
+    function return_nombre_cliente(self, index) result(name_client)
+        class(List_of_list), intent(in) :: self
+        integer, intent(in) :: index
+        character(len=:), allocatable :: name_client
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%index == index) then
+                name_client = current%name_client
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, 'El índice especificado no se encontró en la lista.'
+    end function return_nombre_cliente
+
+    function return_num_ventanilla(self, index) result(num_ventanilla)
+        class(List_of_list), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: num_ventanilla
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%index == index) then
+                num_ventanilla = current%index
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, 'El índice especificado no se encontró en la lista.'
+    end function return_num_ventanilla
+
+    function return_num_imgG(self, index) result(num_imgG_original)
+        class(List_of_list), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: num_imgG_original
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%index == index) then
+                num_imgG_original = current%num_imgG_original
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, 'El índice especificado no se encontró en la lista.'
+    end function return_num_imgG
+
+    function return_num_imgP(self, index) result(num_imgP_original)
+        class(List_of_list), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: num_imgP_original
+
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%index == index) then
+                num_imgP_original = current%num_imgP_original
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, 'El índice especificado no se encontró en la lista.'
+    end function return_num_imgP
 
     function verificar_nodo(self, index) result(pila_llena)
         class(List_of_list), intent(inout) :: self
@@ -132,12 +214,7 @@ contains
             current => current%next
         end do
 
-        ! Si no se encontró ningún nodo ocupado con imágenes grandes, se imprime un mensaje.
-        print *, 'Se han agregado imágenes grandes a todos los nodos ocupados en la lista.'
     end subroutine imagenes_a_ventanilla
-
-
-
 
     subroutine insert(self, index, value)
         class(List_of_list), intent(inout) :: self
@@ -339,7 +416,7 @@ contains
     subroutine asignar_datos_cliente(self, index, name_client,num_imgG, num_imgP)
         class(List_of_list), intent(inout) :: self
         integer, intent(in) :: index
-        integer, intent(in) :: num_imgG
+        integer, intent(in) :: num_imgG 
         integer, intent(in) :: num_imgP
         character(len=*), intent(in) :: name_client
         
@@ -352,6 +429,10 @@ contains
                 current%num_imgG = num_imgG
                 current%num_imgP = num_imgP
                 current%name_client = name_client
+
+                ! asignar el valor original
+                current%num_imgG_original = num_imgG
+                current%num_imgP_original = num_imgP
 
                 if (len_trim(name_client) > 0) then
                     current%ocupado = .true.

@@ -4,6 +4,7 @@ program main
     use cola_recepcion
     use List_of_list_vent
     use cola_impresion
+    use lista_clientes_espera
     
     implicit none
 
@@ -13,6 +14,9 @@ program main
     !colas de impresion (impresoras)
     type(cola_im) :: cola_img_grande
     type(cola_im) :: cola_img_pequena
+
+    !cola de espera
+    type(lista_circular) :: lista_espera 
 
 
     ! Lo que se va a usar para leer el Json
@@ -29,8 +33,10 @@ program main
     integer :: opcion
     integer:: c_ventanillas
     character(len=10) :: ventanilla_name
-
     character(len=:), allocatable :: valor_eliminado
+    integer:: num_pasos
+
+    num_pasos = 0
 
     ! Ciclo para el menú
     do
@@ -90,8 +96,14 @@ program main
                 print *, "Ejecutar paso"
                 ! Primero se verifica si hay clientes en la cola de recepcion para evitar que en el primer paso se asigne cliente y agrege una imegen
                 call list_ventanillas%imagenes_a_ventanilla()
-                call cliente_a_ventanilla()
+                
+                ! Cuando se envian imagenes a impresora el nodo se desocupa, por eso se tiene que realizar antes que cliente_a_ventanilla
                 call img_a_impresora()
+                call cliente_a_ventanilla()
+                
+
+                !se suma un paso
+                num_pasos = num_pasos + 1
 
             case(3)
                 print *, "Estado en memoria de las estructuras"
@@ -103,8 +115,14 @@ program main
                 call cola_img_grande%print()
                 call cola_img_pequena%print()
                 
+                print *, '++++++++++++++++++++++++++++ LISTA DE ESPERA +++++++++++++++++++++++++++++++'
+                call lista_espera%print()
+                print *, "==========================================================================="
+                print *, "Numero de pasos: ", num_pasos
+                
             case(4)
-                print *, "Reportes"   
+                print *, "Reportes"
+                ! call returns_ventanilla()   
             case(5)
                 print *, "Nombre: Elian Angel Fernando Reyes Yac"
                 print *, "Carnet: 202044192"
@@ -147,12 +165,13 @@ contains
         ! Encontrar el primer nodo desocupado
         ventanilla_desocupada = list_ventanillas%buscar_nodo_desocupado()
         
-        ! Imprimir el resultado
         if (ventanilla_desocupada > 0) then
             print *, 'El primer nodo desocupado tiene el índice:', ventanilla_desocupada
+            !Se elimina el cliente de la cola de recepcion
+            call cola_recep%delete()
             call list_ventanillas%asignar_datos_cliente(ventanilla_desocupada, cliente_temp,img_g_temp, img_p_temp)
             !Se elimina el primer nodo de la cola de recepcion, solo si una ventanilla esta disponible
-            call cola_recep%delete()
+            
         else
             print *, 'No se encontraron nodos desocupados.'    
         end if
@@ -166,9 +185,14 @@ contains
 
         ! Ciclo para verificar si el nodo está ocupado
         do x=1,c_ventanillas
+
             pila_llena_ventanilla= list_ventanillas%verificar_nodo(x)
 
             if (pila_llena_ventanilla) then
+
+                ! Cuando la pila esta llena se va el cliente a la lista de espera
+                call returns_ventanilla(x)
+
                 !Ciclo usando check_stack_size para eliminar todos los elementos de la pila
                 do while (list_ventanillas%check_stack_size(x)>0)
                     valor_eliminado = list_ventanillas%popAtIndex(x)
@@ -183,12 +207,28 @@ contains
                     end if
                 end do
             end if
-
         end do
-
-        
-
-    
     end subroutine img_a_impresora
+
+    subroutine returns_ventanilla(n_nodo)
+        character(:), allocatable :: nombre, nombre_ventanilla
+        integer:: num_ventanilla, n_imgG, n_imgP,n_nodo
+
+        nombre= list_ventanillas%return_nombre_cliente(n_nodo)
+        num_ventanilla= list_ventanillas%return_num_ventanilla(n_nodo)
+        n_imgG= list_ventanillas%return_num_imgG(n_nodo)
+        n_imgP= list_ventanillas%return_num_imgP(n_nodo)
+
+
+        ! print *, "Nombre retornado: ", nombre
+        ! print *, "Numero de ventanilla retornado: ", num_ventanilla
+        ! print *, "Numero de imagen grande retornado: ", n_imgG
+        ! print *, "Numero de imagen pequeña retornado: ", n_imgP
+
+        ! call list%append(1, "Cliente1", "Ventanilla1", 2, 1, 6)
+        call lista_espera%append(n_nodo,nombre,num_ventanilla,n_imgG, n_imgP, num_pasos)
+        ! call lista_espera%print()
+
+    end subroutine returns_ventanilla
 
 end program main
