@@ -13,6 +13,7 @@ module List_of_list_vent
         integer :: num_imgP=0
         integer :: num_imgG_original=0
         integer :: num_imgP_original=0
+        logical :: can_wait = .false. !se usa para que espere un paso antes de pasar la lista de espera
         character(:), allocatable :: name_client
         logical :: ocupado = .false.
         type(node), pointer :: next => null()
@@ -137,15 +138,18 @@ contains
         do while (associated(current))
             if (current%index == index) then
                 if (current%ocupado) then
+                    ! para que espere un paso antes de pasar la lista de espera
+                    if (self%check_stack_size(index)>0 .and. current%can_wait) then
+                        current%ocupado = .false.
+                        pila_llena = .true.
+                        print *, 'El nodo ', index, ' tiene la pila llena.'
+                        print *, 'Ocupado:', current%ocupado
+                    end if
+
                     if (current%num_imgG == 0 .and. current%num_imgP == 0) then
-                        if (self%check_stack_size(index)>0) then
-                            current%ocupado = .false.
-                            pila_llena = .true.
-                            print *, 'El nodo ', index, ' tiene la pila llena.'
-                            print *, 'Ocupado:', current%ocupado
-                        end if
+                        current%can_wait = .true.
                     else
-                        print *, 'El nodo ', index, ' tiene imágenes por agregar'
+                        ! print *, 'El nodo ', index, ' tiene imágenes por agregar'
                         print *, 'Número de imágenes grandes: ', current%num_imgG
                         print *, 'Número de imágenes pequeñas: ', current%num_imgP
                         pila_llena = .false.

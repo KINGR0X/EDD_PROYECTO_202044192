@@ -35,8 +35,10 @@ program main
     character(len=10) :: ventanilla_name
     character(len=:), allocatable :: valor_eliminado
     integer:: num_pasos
+    integer:: index_espera
 
     num_pasos = 0
+    index_espera = 0
 
     ! Ciclo para el menú
     do
@@ -97,9 +99,13 @@ program main
                 ! Primero se verifica si hay clientes en la cola de recepcion para evitar que en el primer paso se asigne cliente y agrege una imegen
                 call list_ventanillas%imagenes_a_ventanilla()
                 
-                ! Cuando se envian imagenes a impresora el nodo se desocupa, por eso se tiene que realizar antes que cliente_a_ventanilla
+                ! Esto espera un paso al cliente
                 call img_a_impresora()
                 call cliente_a_ventanilla()
+
+
+                !Esto espera un paso para entregar la imagen impresa
+                call entregar_img_impresas()
                 
 
                 !se suma un paso
@@ -122,7 +128,6 @@ program main
                 
             case(4)
                 print *, "Reportes"
-                ! call returns_ventanilla()   
             case(5)
                 print *, "Nombre: Elian Angel Fernando Reyes Yac"
                 print *, "Carnet: 202044192"
@@ -214,6 +219,10 @@ contains
         character(:), allocatable :: nombre, nombre_ventanilla
         integer:: num_ventanilla, n_imgG, n_imgP,n_nodo
 
+        ! se le suma 1 al index_espera
+        index_espera = index_espera + 1
+
+
         nombre= list_ventanillas%return_nombre_cliente(n_nodo)
         num_ventanilla= list_ventanillas%return_num_ventanilla(n_nodo)
         n_imgG= list_ventanillas%return_num_imgG(n_nodo)
@@ -226,9 +235,24 @@ contains
         ! print *, "Numero de imagen pequeña retornado: ", n_imgP
 
         ! call list%append(1, "Cliente1", "Ventanilla1", 2, 1, 6)
-        call lista_espera%append(n_nodo,nombre,num_ventanilla,n_imgG, n_imgP, num_pasos)
+        call lista_espera%append(index_espera,nombre,num_ventanilla,n_imgG, n_imgP, num_pasos)
         ! call lista_espera%print()
 
     end subroutine returns_ventanilla
+
+    subroutine entregar_img_impresas()
+        integer:: w
+
+        ! Se entrega la imagen impresa
+        w=lista_espera%append_img()
+
+        ! se elimina imagen de la cola de impresion
+        if (w == 1) then
+            call cola_img_grande%delete()
+        else if (w == 2) then
+            call cola_img_pequena%delete()
+        end if
+
+    end subroutine entregar_img_impresas
 
 end program main

@@ -12,6 +12,7 @@ module lista_clientes_espera
         integer :: value
         character(:), allocatable :: name_cliente
         integer :: img_g, img_p, total_pasos, num_ventanilla
+        integer :: n_imgG_original, n_imgP_original 
         type(sub_node), pointer :: stack => null() ! Pila asociada al nodo
         type(node), pointer :: next => null()
         type(node), pointer :: prev => null()
@@ -30,10 +31,73 @@ module lista_clientes_espera
         procedure :: append
         procedure :: print
         procedure :: delete
-        procedure :: push_to_stack
+        procedure :: append_img
+        procedure :: get_img_g
+        procedure :: get_img_p
+        procedure :: get_size
     end type lista_circular
 
 contains
+
+    function get_size(self) result(list_size)
+        class(lista_circular), intent(inout) :: self
+        type(node), pointer :: current
+        integer :: list_size
+        list_size = 0
+
+        if (.not. associated(self%head)) then
+            print *, "La lista está vacía."
+            return
+        end if
+
+        current => self%head
+
+        do while (associated(current))
+            list_size = list_size + 1
+            if (associated(current%next, self%head)) exit
+            current => current%next       
+        end do
+    end function get_size
+
+    function get_img_p(self, index) result(img_g_value)
+        class(lista_circular), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: img_g_value
+        
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index) then
+                img_g_value = current%img_p
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, "El índice especificado no se encontró en la lista."
+        img_g_value = -1 ! O cualquier valor que indique que el índice no se encontró
+    end function get_img_p
+
+    function get_img_g(self, index) result(img_g_value)
+        class(lista_circular), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: img_g_value
+        
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index) then
+                img_g_value = current%img_g
+                return
+            end if
+            current => current%next
+        end do
+
+        print *, "El índice especificado no se encontró en la lista."
+        img_g_value = -1 ! O cualquier valor que indique que el índice no se encontró
+    end function get_img_g
 
     subroutine append(self, value, name_cliente, num_ventanilla, img_g, img_p, total_pasos)
         class(lista_circular), intent(inout) :: self
@@ -54,6 +118,8 @@ contains
         new%img_g = img_g
         new%img_p = img_p
         new%total_pasos = total_pasos
+        new%n_imgG_original= img_g
+        new%n_imgP_original= img_p
 
         new_subnode%value = '' ! Inicializar la pila vacía
 
@@ -77,40 +143,14 @@ contains
         self%tail => new ! asignar la cola de la lista al nuevo nodo agregado
     end subroutine append
 
-
-    subroutine print(self)
-        class(lista_circular), intent(inout) :: self
-        type(node), pointer :: current
-
-        if (.not. associated(self%head)) then
-            print *, "La lista está vacía."
-            return
-        end if
-
-        current => self%head
-
-        do while (associated(current))
-            print *, 'Index nodo:', current%value
-            print *, 'Name Cliente:', current%name_cliente
-            print *, 'Numero Ventanilla:', current%num_ventanilla
-            print *, 'Imagen G:', current%img_g
-            print *, 'Imagen P:', current%img_p
-            print *, 'Total Pasos:', current%total_pasos
-            call print_stack(current%stack)
-            print *, ""
-            if (associated(current%next, self%head)) exit  ! Salir al completar un ciclo (lista circular)
-            current => current%next       
-        end do
-    end subroutine
-
-    subroutine print_stack(stack)
-        type(sub_node), pointer :: stack
-        print *, 'Stack:'
-        do while (associated(stack))
-            print *, stack%value
-            stack => stack%next
-        end do
-    end subroutine print_stack
+    ! subroutine print_stack(stack)
+    !     type(sub_node), pointer :: stack
+    !     print *, 'Stack:'
+    !     do while (associated(stack))
+    !         print *, stack%value
+    !         stack => stack%next
+    !     end do
+    ! end subroutine print_stack
 
     subroutine delete(self, value)
         class(lista_circular), intent(inout) :: self
@@ -180,24 +220,88 @@ contains
         end if
     end subroutine append_to_stack
 
-    subroutine push_to_stack(self, index, value)
-        class(lista_circular), intent(inout) :: self
-        integer, intent(in) :: index
-        character(len=*), intent(in) :: value
-        
+    function append_img(self) result(img_tip)
+        class(lista_circular), intent(inout) :: self      
         type(node), pointer :: current
+        integer :: img_tip
+
+        current => self%head
+
+        ! primero se mira si la lista no está vacía
+            do while (associated(current))
+                if (current%img_g > 0) then
+                    current%img_g = current%img_g - 1
+                    call append_to_stack(current, 'Imagen Grande')
+                    img_tip= return_tipo_img("Imagen Grande")
+                    print *, "Se entrego Img_G al nodo", current%value
+                    return
+                
+                else if (current%img_p > 0) then
+                    current%img_p = current%img_p - 1
+                    call append_to_stack(current, 'Imagen Pequena')
+                    img_tip= return_tipo_img("Imagen Pequena")
+                    print *, "Se entrego Img_P al nodo", current%value
+                    return
+                end if
+                ! Para evitar un bucle infinito
+                if (associated(current%next, self%head)) then
+                    ! print *, "la cabeza es:", self%head%value
+                    exit
+                end if
+                current => current%next
+            end do
+
+        end function append_img
+
+    function return_tipo_img(tipo) result(img_value)
+        character(len=*), intent(in) :: tipo
+        integer :: img_value
+
+        select case (trim(adjustl(tipo)))
+            case ("Imagen Grande")
+                img_value = 1 ! O el valor que corresponda para "IMG grande"
+            case ("Imagen Pequena")
+                img_value = 2 ! O el valor que corresponda para "IMG pequeña"
+            case default
+                ! print *, "Tipo de imagen no válido."
+                img_value = -1 ! O cualquier valor que indique que el tipo de imagen no es válido
+        end select
+    end function return_tipo_img
+
+
+    subroutine print(self)
+        class(lista_circular), intent(inout) :: self
+        type(node), pointer :: current
+        type(sub_node), pointer :: stack
+
+        if (.not. associated(self%head)) then
+            print *, "La lista está vacía."
+            return
+        end if
+
         current => self%head
 
         do while (associated(current))
-            if (current%value == index) then
-                call append_to_stack(current, value)
-                return
-            end if
-            current => current%next
-        end do
+            print *, 'Index nodo:', current%value
+            print *, 'Name Cliente:', current%name_cliente
+            print *, 'Numero Ventanilla:', current%num_ventanilla
+            print *, 'Imagen G:', current%n_imgG_original
+            print *, 'Imagen P:', current%n_imgP_original
+            print *, 'Total Pasos:', current%total_pasos
 
-        print *, "El índice especificado no se encontró en la lista."
-    end subroutine push_to_stack
+            ! Print del stack
+            print *, 'Stack:'
+            stack=> current%stack
+            do while (associated(stack))
+                print *, stack%value
+                stack => stack%next
+            end do
+
+            print *, ""
+            if (associated(current%next, self%head)) exit  ! Salir al completar un ciclo (lista circular)
+            current => current%next       
+        end do
+    end subroutine print
 
 end module lista_clientes_espera
 
@@ -206,21 +310,24 @@ end module lista_clientes_espera
 !     implicit none
     
 !     type(lista_circular) :: list
+!     integer:: size_list
 
 !     ! Agregar nodos a la lista
-!     call list%append(1, "Cliente1", "Ventanilla1", 2, 1, 6)
-!     call list%append(2, "Cliente2", "Ventanilla2", 3, 3, 7)
-!     call list%append(3, "Cliente3", "Ventanilla3", 4, 2, 8)
+!     call list%append(1, "Cliente1", 1, 1, 1, 6)
+!     call list%append(2, "Cliente2", 2, 3, 3, 7)
+!     ! call list%append(3, "Cliente3", 3, 4, 2, 8)
 
-!     call list%push_to_stack(1, 'valor1') ! Agrega el valor 'valor1' a la pila del nodo con índice 1
-!     call list%push_to_stack(2, 'valor2') ! Agrega el valor 'valor2' a la pila del nodo con índice 2
-!     call list%push_to_stack(2, 'valor3') ! Agrega el valor 'valor3' a la pila del nodo con índice 2
-!     call list%push_to_stack(2, 'valor4') ! Agrega el valor 'valor4' a la pila del nodo con índice 3
+!     call list%append_img(1) ! Agrega el valor 'valor1' a la pila del nodo con índice 1
+!     call list%append_img(1) ! Agrega el valor 'valor2' a la pila del nodo con índice 2
+!     ! call list%append_img(2, 'valor3') ! Agrega el valor 'valor3' a la pila del nodo con índice 2
+!     ! call list%append_img(2, 'valor4') ! Agrega el valor 'valor4' a la pila del nodo con índice 3
 
 
 !     ! Imprimir la lista
 !     call list%print()
 
+!     ! size_list= list%get_size()
+!     ! print *, "El tamaño de la lista es: ", size_list
 
 
 !     ! Eliminar un nodo de la lista
