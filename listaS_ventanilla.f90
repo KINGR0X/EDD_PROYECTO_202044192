@@ -13,7 +13,6 @@ module List_of_list_vent
         integer :: num_imgP=0
         integer :: num_imgG_original=0
         integer :: num_imgP_original=0
-        logical :: can_wait = .false. !se usa para que espere un paso antes de pasar la lista de espera
         character(:), allocatable :: name_client
         logical :: ocupado = .false.
         type(node), pointer :: next => null()
@@ -103,7 +102,7 @@ contains
             current => current%next
         end do
 
-        print *, 'El índice especificado no se encontró en la lista.'
+        ! print *, 'El índice especificado no se encontró en la lista.'
     end function return_num_imgG
 
     function return_num_imgP(self, index) result(num_imgP_original)
@@ -122,7 +121,7 @@ contains
             current => current%next
         end do
 
-        print *, 'El índice especificado no se encontró en la lista.'
+        ! print *, 'El índice especificado no se encontró en la lista.'
     end function return_num_imgP
 
     function verificar_nodo(self, index) result(pila_llena)
@@ -139,19 +138,17 @@ contains
             if (current%index == index) then
                 if (current%ocupado) then
                     ! para que espere un paso antes de pasar la lista de espera
-                    if (self%check_stack_size(index)>0 .and. current%can_wait) then
-                        current%ocupado = .false.
-                        pila_llena = .true.
-                        print *, 'El nodo ', index, ' tiene la pila llena.'
-                        print *, 'Ocupado:', current%ocupado
-                    end if
-
                     if (current%num_imgG == 0 .and. current%num_imgP == 0) then
-                        current%can_wait = .true.
+                        if (self%check_stack_size(index)>0) then
+                            current%ocupado = .false.
+                            pila_llena = .true.
+                            ! print *, 'El nodo ', index, ' tiene la pila llena.'
+                            ! print *, 'Ocupado:', current%ocupado
+                        end if
                     else
                         ! print *, 'El nodo ', index, ' tiene imágenes por agregar'
-                        print *, 'Número de imágenes grandes: ', current%num_imgG
-                        print *, 'Número de imágenes pequeñas: ', current%num_imgP
+                        ! print *, 'Número de imágenes grandes: ', current%num_imgG
+                        ! print *, 'Número de imágenes pequeñas: ', current%num_imgP
                         pila_llena = .false.
                     end if
                 end if
@@ -206,12 +203,14 @@ contains
             if (current%ocupado .and. current%num_imgG > 0) then
                 ! Agregar una imagen grande
                 call self%insert(current%index, 'Imagen Grande')
+                print '(A,I2,A)', "La ventanilla ", current%index, " recibio una Imagen Grande."
                 ! Decrementar el contador de imágenes grandes
                 current%num_imgG = current%num_imgG - 1
 
             else if (current%ocupado .and. current%num_imgP > 0) then
                 ! Agregar una imagen grande
                 call self%insert(current%index, 'Imagen Pequena')
+                print '(A,I2,A)', "La ventanilla ", current%index, " recibio una Imagen Pequena."
                 ! Decrementar el contador de imágenes grandes
                 current%num_imgP = current%num_imgP - 1
             end if
@@ -337,14 +336,14 @@ contains
         type(sub_node), pointer :: temp
 
         if (.not. associated(this%stack)) then
-            print *, 'La pila está vacía.'
+            ! print *, 'La pila está vacía.'
             return
         end if
 
         temp => this%stack
         this%stack => this%stack%next
         return_value = temp%value
-        print *, '******** Pop:', temp%value, " ********"
+        ! print *, '******** Pop:', temp%value, " ********"
 
         deallocate(temp)
     end function pop
@@ -364,8 +363,6 @@ contains
             end if
             current => current%next
         end do
-
-        print *, 'El índice especificado no se encontró en la lista.'
     end function popAtIndex
 
     subroutine pop_normal(this)
@@ -440,6 +437,7 @@ contains
 
                 if (len_trim(name_client) > 0) then
                     current%ocupado = .true.
+                    print *, 'El cliente ', current%name_client, ' ingresa a la ventanilla ', current%index
                 else
                     current%ocupado = .false.
                 end if

@@ -35,9 +35,70 @@ module lista_clientes_espera
         procedure :: get_img_g
         procedure :: get_img_p
         procedure :: get_size
+        procedure :: get_name_cliente
+        procedure :: get_num_ventanilla
+        procedure :: get_total_pasos
+        procedure :: verificar_completo
     end type lista_circular
 
 contains
+
+    function get_total_pasos(self, index) result(total_pasos)
+        class(lista_circular), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: total_pasos
+        
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index) then
+                total_pasos = current%total_pasos
+                return
+            end if
+            current => current%next
+        end do
+
+        ! print *, "El índice especificado no se encontró en la lista."
+    end function get_total_pasos
+
+    function get_name_cliente(self, index) result(name_cliente)
+        class(lista_circular), intent(in) :: self
+        integer, intent(in) :: index
+        character(len=:), allocatable :: name_cliente
+        
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index) then
+                name_cliente = current%name_cliente
+                return
+            end if
+            current => current%next
+        end do
+
+        ! print *, "El índice especificado no se encontró en la lista."
+    end function get_name_cliente
+
+    function get_num_ventanilla(self, index) result(num_ventanilla)
+        class(lista_circular), intent(in) :: self
+        integer, intent(in) :: index
+        integer :: num_ventanilla
+        
+        type(node), pointer :: current
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index) then
+                num_ventanilla = current%num_ventanilla
+                return
+            end if
+            current => current%next
+        end do
+
+        ! print *, "El índice especificado no se encontró en la lista."
+    end function get_num_ventanilla
 
     function get_size(self) result(list_size)
         class(lista_circular), intent(inout) :: self
@@ -46,7 +107,7 @@ contains
         list_size = 0
 
         if (.not. associated(self%head)) then
-            print *, "La lista está vacía."
+            ! print *, "La lista está vacía."
             return
         end if
 
@@ -69,14 +130,13 @@ contains
 
         do while (associated(current))
             if (current%value == index) then
-                img_g_value = current%img_p
+                img_g_value = current%n_imgP_original
                 return
             end if
             current => current%next
         end do
 
-        print *, "El índice especificado no se encontró en la lista."
-        img_g_value = -1 ! O cualquier valor que indique que el índice no se encontró
+        ! print *, "El índice especificado no se encontró en la lista."
     end function get_img_p
 
     function get_img_g(self, index) result(img_g_value)
@@ -89,14 +149,12 @@ contains
 
         do while (associated(current))
             if (current%value == index) then
-                img_g_value = current%img_g
+                img_g_value = current%n_imgG_original
                 return
             end if
             current => current%next
         end do
 
-        print *, "El índice especificado no se encontró en la lista."
-        img_g_value = -1 ! O cualquier valor que indique que el índice no se encontró
     end function get_img_g
 
     subroutine append(self, value, name_cliente, num_ventanilla, img_g, img_p, total_pasos)
@@ -143,14 +201,6 @@ contains
         self%tail => new ! asignar la cola de la lista al nuevo nodo agregado
     end subroutine append
 
-    ! subroutine print_stack(stack)
-    !     type(sub_node), pointer :: stack
-    !     print *, 'Stack:'
-    !     do while (associated(stack))
-    !         print *, stack%value
-    !         stack => stack%next
-    !     end do
-    ! end subroutine print_stack
 
     subroutine delete(self, value)
         class(lista_circular), intent(inout) :: self
@@ -158,7 +208,7 @@ contains
         type(node), pointer :: current, previous, new_tail
 
         if (.not. associated(self%head)) then
-            print *, "La lista está vacía. No se puede eliminar el valor: ", value
+            ! print *, "La lista está vacía. No se puede eliminar el valor: ", value
             return
         end if
 
@@ -195,9 +245,9 @@ contains
             
             deallocate(current)
             self%tail => new_tail ! Actualizar la cola de la lista
-            print *, "Se ha eliminado correctamente el valor: ", value
+            ! print *, "Se ha eliminado correctamente el valor: ", value
         else
-            print *, "No se ha encontrado el valor: ", value
+            ! print *, "No se ha encontrado el valor: ", value
         end if
     end subroutine delete
 
@@ -233,14 +283,14 @@ contains
                     current%img_g = current%img_g - 1
                     call append_to_stack(current, 'Imagen Grande')
                     img_tip= return_tipo_img("Imagen Grande")
-                    print *, "Se entrego Img_G al nodo", current%value
+                    print *, "Se entrego una Imagen Grande al cliente ", current%name_cliente
                     return
                 
                 else if (current%img_p > 0) then
                     current%img_p = current%img_p - 1
                     call append_to_stack(current, 'Imagen Pequena')
                     img_tip= return_tipo_img("Imagen Pequena")
-                    print *, "Se entrego Img_P al nodo", current%value
+                    print *, "Se entrego una Imagen Pequena al cliente", current%name_cliente
                     return
                 end if
                 ! Para evitar un bucle infinito
@@ -275,7 +325,7 @@ contains
         type(sub_node), pointer :: stack
 
         if (.not. associated(self%head)) then
-            print *, "La lista está vacía."
+            ! print *, "La lista está vacía."
             return
         end if
 
@@ -285,8 +335,8 @@ contains
             print *, 'Index nodo:', current%value
             print *, 'Name Cliente:', current%name_cliente
             print *, 'Numero Ventanilla:', current%num_ventanilla
-            print *, 'Imagen G:', current%n_imgG_original
-            print *, 'Imagen P:', current%n_imgP_original
+            print *, 'Imagen G:', current%img_g
+            print *, 'Imagen P:', current%img_p
             print *, 'Total Pasos:', current%total_pasos
 
             ! Print del stack
@@ -302,6 +352,28 @@ contains
             current => current%next       
         end do
     end subroutine print
+
+    function verificar_completo(self, index) result(complete)
+        class(lista_circular), intent(inout) :: self
+        integer, intent(in) :: index
+        logical :: complete
+        type(node), pointer :: current
+        complete = .false.
+
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index .and. current%img_g == 0 .and. current%img_p == 0) then
+                complete = .true.
+                return
+            end if
+            current => current%next
+            if (associated(current, self%head)) exit  ! Salir al completar un ciclo (lista circular)
+        end do
+
+        complete = .false.
+    end function verificar_completo
+
 
 end module lista_clientes_espera
 

@@ -54,11 +54,11 @@ contains
         type(node), pointer :: temp
 
         if (.not. associated(this%head)) then
-            print *, 'Cola recepcion esta vacia'
+            ! print *, 'La cola recepcion esta vacia'
             return
         end if
 
-        print *, 'Cliente eliminado de cola de recepcion: ', this%head%value
+        print *, this%head%value, ' sale de la cola de recepcion' 
         temp => this%head
         this%head => this%head%next
         deallocate(temp)
@@ -87,7 +87,7 @@ contains
         character(len=:), allocatable :: head_value
 
         if (.not. associated(this%head)) then
-            print *, 'Cola esta vacia'
+            ! print *, 'Cola esta vacia'
             head_value = ""
         else
             head_value = this%head%value
@@ -99,7 +99,7 @@ contains
         integer :: img_g
 
         if (.not. associated(this%head)) then
-            print *, 'Cola esta vacia'
+            ! print *, 'Cola esta vacia'
             img_g = 0
         else
             img_g = this%head%img_g
@@ -111,7 +111,7 @@ contains
         integer :: img_p
 
         if (.not. associated(this%head)) then
-            print *, 'Cola esta vacia'
+            ! print *, 'Cola esta vacia'
             img_p = 0
         else
             img_p = this%head%img_p

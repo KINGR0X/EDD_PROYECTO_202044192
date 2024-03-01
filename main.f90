@@ -5,6 +5,7 @@ program main
     use List_of_list_vent
     use cola_impresion
     use lista_clientes_espera
+    use lista_clientes_atentidos
     
     implicit none
 
@@ -17,6 +18,9 @@ program main
 
     !cola de espera
     type(lista_circular) :: lista_espera 
+
+    ! Lista simple clientes atendidos
+    type(lista_simple_atendidos):: lista_c_atendidos
 
 
     ! Lo que se va a usar para leer el Json
@@ -36,9 +40,11 @@ program main
     character(len=:), allocatable :: valor_eliminado
     integer:: num_pasos
     integer:: index_espera
+    integer:: index_atendidos
 
     num_pasos = 0
     index_espera = 0
+    index_atendidos = 0
 
     ! Ciclo para el menú
     do
@@ -93,23 +99,24 @@ program main
                     call list_ventanillas%pop_inicial(i)
                     call list_ventanillas%pop_inicial(i)
                 end do
-                
+                num_pasos = 0
             case(2)
-                print *, "Ejecutar paso"
-                ! Primero se verifica si hay clientes en la cola de recepcion para evitar que en el primer paso se asigne cliente y agrege una imegen
-                call list_ventanillas%imagenes_a_ventanilla()
-                
-                ! Esto espera un paso al cliente
-                call img_a_impresora()
-                call cliente_a_ventanilla()
+                !se suma un paso
+                num_pasos = num_pasos + 1
+                print '(A,I2,A)', "--------------- Paso ", num_pasos, " ---------------"
 
+                call clientes_a_atendidos()
 
                 !Esto espera un paso para entregar la imagen impresa
                 call entregar_img_impresas()
-                
 
-                !se suma un paso
-                num_pasos = num_pasos + 1
+                ! Esto espera un paso al cliente
+                call img_a_impresora()
+
+                ! Primero se verifica si hay clientes en la cola de recepcion para evitar que en el primer paso se asigne cliente y agrege una imegen
+                call list_ventanillas%imagenes_a_ventanilla()
+
+                call cliente_a_ventanilla()
 
             case(3)
                 print *, "Estado en memoria de las estructuras"
@@ -125,6 +132,9 @@ program main
                 call lista_espera%print()
                 print *, "==========================================================================="
                 print *, "Numero de pasos: ", num_pasos
+
+                print *, "|||||||||||||||||||||||||||| CLIENTES ATENDIDOS ||||||||||||||||||||||||||||"
+                call lista_c_atendidos%print()
                 
             case(4)
                 print *, "Reportes"
@@ -171,14 +181,15 @@ contains
         ventanilla_desocupada = list_ventanillas%buscar_nodo_desocupado()
         
         if (ventanilla_desocupada > 0) then
-            print *, 'El primer nodo desocupado tiene el índice:', ventanilla_desocupada
+            ! print *, 'Esta desocupada la ventanilla:', ventanilla_desocupada
             !Se elimina el cliente de la cola de recepcion
             call cola_recep%delete()
             call list_ventanillas%asignar_datos_cliente(ventanilla_desocupada, cliente_temp,img_g_temp, img_p_temp)
+            ! print *, "El cliente ", cliente_temp, " ingresa a la ventanilla",ventanilla_desocupada
             !Se elimina el primer nodo de la cola de recepcion, solo si una ventanilla esta disponible
             
-        else
-            print *, 'No se encontraron nodos desocupados.'    
+        ! else
+            ! print *, 'No se encontraron nodos desocupados.'    
         end if
 
     end subroutine cliente_a_ventanilla
@@ -205,10 +216,10 @@ contains
                     ! Se revisa si el valor_elimiado es igual a "Imagen Grande"
                     if (valor_eliminado == "Imagen Grande") then
                         call cola_img_grande%append(valor_eliminado)
-                        print *, "Valor eliminado: ", valor_eliminado
-                    else
+                        print *, "La impresora grande recibio una imagen"
+                    else if (valor_eliminado == "Imagen Pequena") then
                         call cola_img_pequena%append(valor_eliminado)
-                        print *, "Valor eliminado: ", valor_eliminado
+                        print *, "La impresora pequena recibio una imagen"
                     end if
                 end do
             end if
@@ -229,13 +240,9 @@ contains
         n_imgP= list_ventanillas%return_num_imgP(n_nodo)
 
 
-        ! print *, "Nombre retornado: ", nombre
-        ! print *, "Numero de ventanilla retornado: ", num_ventanilla
-        ! print *, "Numero de imagen grande retornado: ", n_imgG
-        ! print *, "Numero de imagen pequeña retornado: ", n_imgP
-
         ! call list%append(1, "Cliente1", "Ventanilla1", 2, 1, 6)
         call lista_espera%append(index_espera,nombre,num_ventanilla,n_imgG, n_imgP, num_pasos)
+        print *, "El cliente ", nombre, " pasa a la lista de espera"
         ! call lista_espera%print()
 
     end subroutine returns_ventanilla
@@ -249,10 +256,42 @@ contains
         ! se elimina imagen de la cola de impresion
         if (w == 1) then
             call cola_img_grande%delete()
+            ! print *, "La impresora grande entrego una imagen"
         else if (w == 2) then
             call cola_img_pequena%delete()
+            ! print *, "La impresora pequena entrego una imagen"
         end if
 
     end subroutine entregar_img_impresas
+
+    subroutine clientes_a_atendidos()
+        integer:: z, size_lista_espera
+        integer:: e_img_g, e_img_p, e_num_v, espera_num_pasos
+        character(:), allocatable :: e_nombre_cliente
+
+        index_atendidos = index_atendidos + 1
+
+        size_lista_espera= lista_espera%get_size()
+
+        ! print *, "Tamaño lista espera: ", size_lista_espera
+        do z=1,size_lista_espera
+
+            if (lista_espera%verificar_completo(z) .eqv. .true.) then
+                e_img_g= lista_espera%get_img_g(z)
+                e_img_p= lista_espera%get_img_p(z)
+                e_nombre_cliente= lista_espera%get_name_cliente(z)
+                e_num_v= lista_espera%get_num_ventanilla(z)
+
+                ! print *, "||||||||||||||||||||||||||| CLIENTE ATENDIDO |||||||||||||||||||||||||||"
+                ! print *, "Cliente atendido: ", e_nombre_cliente
+                ! print *, "Numero de ventanilla: ", e_num_v
+                ! print *, "Numero de pasos: ", num_pasos 
+                ! print *, "Imagen grande: ", e_img_g
+                ! print *, "Imagen pequeña: ", e_img_p
+
+                call lista_c_atendidos%append(index_atendidos,e_nombre_cliente, e_num_v, e_img_g, e_img_p, num_pasos)
+            end if
+        end do
+    end subroutine clientes_a_atendidos
 
 end program main
