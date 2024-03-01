@@ -207,7 +207,7 @@ contains
             if (pila_llena_ventanilla) then
 
                 ! Cuando la pila esta llena se va el cliente a la lista de espera
-                call returns_ventanilla(x)
+                call cliente_a_espera(x)
 
                 !Ciclo usando check_stack_size para eliminar todos los elementos de la pila
                 do while (list_ventanillas%check_stack_size(x)>0)
@@ -226,7 +226,7 @@ contains
         end do
     end subroutine img_a_impresora
 
-    subroutine returns_ventanilla(n_nodo)
+    subroutine cliente_a_espera(n_nodo)
         character(:), allocatable :: nombre, nombre_ventanilla
         integer:: num_ventanilla, n_imgG, n_imgP,n_nodo
 
@@ -245,7 +245,7 @@ contains
         print *, "El cliente ", nombre, " pasa a la lista de espera"
         ! call lista_espera%print()
 
-    end subroutine returns_ventanilla
+    end subroutine cliente_a_espera
 
     subroutine entregar_img_impresas()
         integer:: w
@@ -265,33 +265,31 @@ contains
     end subroutine entregar_img_impresas
 
     subroutine clientes_a_atendidos()
-        integer:: z, size_lista_espera
-        integer:: e_img_g, e_img_p, e_num_v, espera_num_pasos
-        character(:), allocatable :: e_nombre_cliente
+        integer :: z, size_lista_espera, min_espera
+        integer :: e_img_g, e_img_p, e_num_v, espera_num_pasos
+        character(len=:), allocatable :: e_nombre_cliente
 
-        index_atendidos = index_atendidos + 1
+        size_lista_espera = lista_espera%get_size()
 
-        size_lista_espera= lista_espera%get_size()
+        ! Asegurarse de que la lista de espera tenga al menos un cliente
+        if (size_lista_espera > 0) then
 
-        ! print *, "Tamaño lista espera: ", size_lista_espera
-        do z=1,size_lista_espera
+            min_espera= lista_espera%get_min_value()
 
-            if (lista_espera%verificar_completo(z) .eqv. .true.) then
-                e_img_g= lista_espera%get_img_g(z)
-                e_img_p= lista_espera%get_img_p(z)
-                e_nombre_cliente= lista_espera%get_name_cliente(z)
-                e_num_v= lista_espera%get_num_ventanilla(z)
-
-                ! print *, "||||||||||||||||||||||||||| CLIENTE ATENDIDO |||||||||||||||||||||||||||"
-                ! print *, "Cliente atendido: ", e_nombre_cliente
-                ! print *, "Numero de ventanilla: ", e_num_v
-                ! print *, "Numero de pasos: ", num_pasos 
-                ! print *, "Imagen grande: ", e_img_g
-                ! print *, "Imagen pequeña: ", e_img_p
-
-                call lista_c_atendidos%append(index_atendidos,e_nombre_cliente, e_num_v, e_img_g, e_img_p, num_pasos)
+            if (min_espera>0) then
+                z= min_espera
+                if (lista_espera%verificar_completo(z) .eqv. .true.)then 
+                    e_img_g = lista_espera%get_img_g(z)
+                    e_img_p = lista_espera%get_img_p(z)
+                    e_nombre_cliente = lista_espera%get_name_cliente(z)
+                    e_num_v = lista_espera%get_num_ventanilla(z)
+                    index_atendidos = index_atendidos + 1
+                    print *, "El cliente ", e_nombre_cliente, " fue atendido"
+                    call lista_c_atendidos%append(index_atendidos, e_nombre_cliente, e_num_v, e_img_g, e_img_p, num_pasos)
+                    call lista_espera%delete(z)
+                end if
             end if
-        end do
+        end if
     end subroutine clientes_a_atendidos
-
+    
 end program main

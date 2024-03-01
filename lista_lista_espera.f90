@@ -39,9 +39,34 @@ module lista_clientes_espera
         procedure :: get_num_ventanilla
         procedure :: get_total_pasos
         procedure :: verificar_completo
+        procedure :: get_min_value
     end type lista_circular
 
 contains
+
+    function get_min_value(self) result(min_value)
+        class(lista_circular), intent(in) :: self
+        integer :: min_value
+        type(node), pointer :: current
+        min_value = 0 ! Valor inicial
+
+        if (.not. associated(self%head)) then
+            print *, "La lista está vacía."
+            return
+        end if
+
+        current => self%head
+        min_value = current%value
+
+        do
+            current => current%next
+            if (current%value < min_value) then
+                min_value = current%value
+            end if
+            if (associated(current, self%head)) exit
+        end do
+    end function get_min_value
+
 
     function get_total_pasos(self, index) result(total_pasos)
         class(lista_circular), intent(in) :: self
@@ -208,48 +233,52 @@ contains
         type(node), pointer :: current, previous, new_tail
 
         if (.not. associated(self%head)) then
-            ! print *, "La lista está vacía. No se puede eliminar el valor: ", value
+            print *, "La lista está vacía. No se puede eliminar el valor: ", value
             return
         end if
 
         current => self%head
-        previous => null()
-
+        previous => self%tail ! Para mantener el puntero al nodo anterior al current
+        
         ! Buscar el nodo con el valor dado
         do while (associated(current) .and. current%value /= value)
             previous => current
             current => current%next
+            if (associated(current, self%head)) exit ! Salir si se llega al final de la lista
         end do
 
         ! Si se encuentra el nodo, eliminarlo
         if (associated(current) .and. current%value == value) then
-            if (associated(previous)) then
-                ! El nodo a eliminar no es el primero
-                previous%next => current%next
-                current%next%prev => previous ! Actualizar prev del nodo siguiente al nodo a eliminar
-            else
+            if (associated(current, self%head)) then
                 ! El nodo a eliminar es el primero
-                self%head => current%next
-                current%next%prev => null() ! El nuevo primer nodo no tiene previo
-            end if
-
-            if (associated(current,self%tail)) then
-                if (associated(previous)) then
-                    new_tail => previous ! Si el nodo eliminado es la cola, entonces el nuevo nodo de cola es el anterior
+                if (associated(current%next, self%head)) then
+                    ! Si la lista tiene solo un nodo
+                    deallocate(current)
+                    self%head => null()
+                    self%tail => null()
                 else
-                    new_tail => null() ! Si el nodo eliminado es el único, entonces la cola ahora es null
+                    self%head => current%next
+                    self%tail%next => current%next
+                    current%next%prev => self%tail
+                    deallocate(current)
                 end if
+            else if (associated(current, self%tail)) then
+                ! El nodo a eliminar es el último
+                previous%next => self%head
+                self%tail => previous
+                deallocate(current)
             else
-                new_tail => self%tail
+                ! El nodo a eliminar está en el medio
+                previous%next => current%next
+                current%next%prev => previous
+                deallocate(current)
             end if
-            
-            deallocate(current)
-            self%tail => new_tail ! Actualizar la cola de la lista
             ! print *, "Se ha eliminado correctamente el valor: ", value
         else
             ! print *, "No se ha encontrado el valor: ", value
         end if
     end subroutine delete
+
 
     subroutine append_to_stack(this, value)
         class(node), intent(inout) :: this
@@ -380,32 +409,40 @@ end module lista_clientes_espera
 ! program main
 !     use lista_clientes_espera
 !     implicit none
-    
+
 !     type(lista_circular) :: list
-!     integer:: size_list
+
+!     integer :: min
+
 
 !     ! Agregar nodos a la lista
 !     call list%append(1, "Cliente1", 1, 1, 1, 6)
-!     call list%append(2, "Cliente2", 2, 3, 3, 7)
+!     call list%append(10, "Cliente2", 2, 3, 3, 7)
 !     ! call list%append(3, "Cliente3", 3, 4, 2, 8)
 
-!     call list%append_img(1) ! Agrega el valor 'valor1' a la pila del nodo con índice 1
-!     call list%append_img(1) ! Agrega el valor 'valor2' a la pila del nodo con índice 2
 !     ! call list%append_img(2, 'valor3') ! Agrega el valor 'valor3' a la pila del nodo con índice 2
 !     ! call list%append_img(2, 'valor4') ! Agrega el valor 'valor4' a la pila del nodo con índice 3
 
 
 !     ! Imprimir la lista
-!     call list%print()
+!     ! call list%print()
 
 !     ! size_list= list%get_size()
 !     ! print *, "El tamaño de la lista es: ", size_list
 
 
 !     ! Eliminar un nodo de la lista
-!     print *, " "
-!     ! call list%delete(2)
+!     print *, "-------------------------------"
+!     call list%delete(1)
+!     ! call list%print()
+!     call list%append(3, "Cliente3", 3, 4, 2, 8)
+!     call list%append(4, "Cliente4", 4, 5, 1, 9)
 
 !     ! ! Imprimir la lista después de la eliminación
-!     ! call list%print()
+!     call list%print()
+
+!     ! Obtener el valor más pequeño
+!     min= list%get_min_value()
+!     print *, "El valor más pequeño es: ", min
+
 ! end program main
