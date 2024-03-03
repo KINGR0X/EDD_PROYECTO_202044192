@@ -138,6 +138,7 @@ program main
                 
             case(4)
                 print *, "Reportes"
+                call cola_recep%graficar("cola_recepcion.dot")
             case(5)
                 print *, "Nombre: Elian Angel Fernando Reyes Yac"
                 print *, "Carnet: 202044192"

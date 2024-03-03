@@ -20,6 +20,7 @@ module cola_recepcion
         procedure :: return_cliente_name
         procedure :: return_cliente_img_g
         procedure :: return_cliente_img_p
+        procedure :: graficar
     end type cola
 
 contains
@@ -118,6 +119,53 @@ contains
         end if
     end function  return_cliente_img_p
 
+    subroutine graficar(this, filename)
+        class(cola), intent(in) :: this
+        character(len=*), intent(in) :: filename
+        type(node), pointer :: current
+        integer :: img, imp
+
+        integer :: unit
+        integer :: count
+
+        open(unit, file=filename, status='replace')
+        write(unit, *) 'digraph Cola_recepcion {'
+        write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=gold];' ! Aplicar atributos a todos los nodos
+        
+        ! Escribir nodos y conexiones
+        current => this%head
+        count = 0
+
+        do while (associated(current))
+            count = count + 1
+            img= current%img_g
+            imp= current%img_p
+            write(unit, *) '    "Node', count, '" [label="', current%value, "\n Img_g =",img,"\n Img_p =",imp,'"];'
+            
+            if (associated(current%next)) then
+                write(unit, *) '    "Node', count, '" -> "Node', count+1, '";'
+            end if
+            current => current%next
+        end do 
+
+        ! do while (associated(current))
+        !     print *, current%value
+        !     print *, "img_g: ", current%img_g
+        !     print *, "img_p: ", current%img_p
+        !     print *, "---------------"
+        !     current => current%next
+        ! end do 
+
+        ! Cerrar el archivo DOT
+        write(unit, *) '}'
+        close(unit)
+    
+        ! Generar el archivo PNG utilizando Graphviz
+        call system('dot -Tpdf ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.pdf')
+    
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.pdf'
+    end subroutine graficar
+
 end module cola_recepcion
 
 ! program main
@@ -128,12 +176,14 @@ end module cola_recepcion
 !     character(len=:), allocatable :: nombre_cliente
     
 !     call cola_r%append("Juan", 1, 2)
+!     call cola_r%append("Pedro", 3, 4)
+!     call cola_r%append("Maria", 5, 6)
 
-!     call cola_r%print()
+!     ! call cola_r%print()
 
 !     nombre_cliente = cola_r%return_cliente_name()
 
-!     print *, "Nombre del cliente: ", nombre_cliente
-
+!     call cola_r%print()
+!     call cola_r%graficar('cola_recepcion')
 
 ! end program main

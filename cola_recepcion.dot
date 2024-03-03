@@ -1,0 +1,22 @@
+ digraph Cola_recepcion {
+     node [shape=box, style=filled, color=blue, fillcolor=gold];
+     "Node           1 " [label="Andres C1\n Img_g =           1 \n Img_p =           1 "];
+     "Node           1 " -> "Node           2 ";
+     "Node           2 " [label="Juan Perez C2\n Img_g =           3 \n Img_p =           0 "];
+     "Node           2 " -> "Node           3 ";
+     "Node           3 " [label="Luis Higueros c3\n Img_g =           0 \n Img_p =           2 "];
+     "Node           3 " -> "Node           4 ";
+     "Node           4 " [label="Cliente 4\n Img_g =           5 \n Img_p =           2 "];
+     "Node           4 " -> "Node           5 ";
+     "Node           5 " [label="Cliente 5\n Img_g =           0 \n Img_p =           7 "];
+     "Node           5 " -> "Node           6 ";
+     "Node           6 " [label="Cliente 6\n Img_g =           9 \n Img_p =           0 "];
+     "Node           6 " -> "Node           7 ";
+     "Node           7 " [label="Cliente 7\n Img_g =           0 \n Img_p =           4 "];
+     "Node           7 " -> "Node           8 ";
+     "Node           8 " [label="Cliente 8\n Img_g =           0 \n Img_p =           6 "];
+     "Node           8 " -> "Node           9 ";
+     "Node           9 " [label="Cliente 9\n Img_g =           0 \n Img_p =           1 "];
+     "Node           9 " -> "Node          10 ";
+     "Node          10 " [label="Cliente 10\n Img_g =           2 \n Img_p =           0 "];
+ }
