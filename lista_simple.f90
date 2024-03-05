@@ -21,9 +21,109 @@ module lista_clientes_atentidos
         procedure :: search
         procedure :: print_pointers
         procedure :: graficar
+        procedure :: graficar_por_nombre
+        procedure :: graficar_nodo_max_pasos
     end type lista_simple_atendidos
 
 contains
+
+    subroutine graficar_nodo_max_pasos(this, filename2)
+        class(lista_simple_atendidos), intent(in) :: this
+        character(len=*), intent(in) :: filename2
+        type(node), pointer :: current, max_node
+        integer :: max_pasos
+
+        integer :: unit
+
+        ! Inicializar el nodo máximo
+        max_pasos = -1
+        max_node => null()
+
+        ! Encontrar el nodo con el máximo total_pasos
+        current => this%head
+        do while (associated(current))
+            if (current%total_pasos > max_pasos) then
+                max_pasos = current%total_pasos
+                max_node => current
+            end if
+            current => current%next
+        end do
+
+        ! Graficar el nodo con el máximo total_pasos si se encontró uno
+        if (associated(max_node)) then
+            ! call graficar_por_nombre(this, filename2, max_node%name_cliente)
+
+            open(unit, file=filename2, status='replace')
+            write(unit, *) 'digraph lista_atendidos {'
+            write(unit, *) 'label= "Reporte cliente";'
+            write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];' ! Aplicar atributos a todos los nodos
+
+            write(unit, *) '    "Node1', '" [label="',max_node%name_cliente, &
+                "\n Img_g =",max_node%img_g,&
+                "\n Img_p =",max_node%img_p,&
+                "\n pasos =",max_node%total_pasos,&
+                "\n ventanilla de atencion=",&
+                max_node%num_ventanilla,'"];'
+
+                ! Cerrar el archivo DOT
+                write(unit, *) '}'
+                close(unit)
+
+                ! Generar el archivo PNG utilizando Graphviz
+                call system('dot -Tpdf ' // trim(filename2) // ' -o ' // trim(adjustl(filename2)) // '.pdf')
+
+                print *, 'Graphviz file generated: ', trim(adjustl(filename2)) // '.pdf'
+        else
+            print *, 'No se encontró ningún nodo en la lista.'
+        end if
+    end subroutine graficar_nodo_max_pasos
+
+    subroutine graficar_por_nombre(this, filename, nombre_cliente)
+        class(lista_simple_atendidos), intent(in) :: this
+        character(len=*), intent(in) :: filename
+        character(len=*), intent(in) :: nombre_cliente
+        type(node), pointer :: current
+
+        integer :: img, imp, pa, ven
+        integer :: unit
+        integer :: count
+
+        open(unit, file=filename, status='replace')
+        write(unit, *) 'digraph lista_atendidos {'
+        write(unit, *) 'label= "Reporte cliente";'
+        write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];' ! Aplicar atributos a todos los nodos
+
+        current => this%head
+        count = 0
+
+        do while (associated(current))
+            if (trim(current%name_cliente) == trim(nombre_cliente)) then
+                ! print *, 'Cliente encontrado: ', current%name_cliente
+                count = count + 1
+                img = current%img_g
+                imp = current%img_p
+                pa = current%total_pasos
+                ven = current%num_ventanilla
+
+                write(unit, *) '    "Node', count, '" [label="',current%name_cliente, &
+                "\n Img_g =",img,"\n Img_p =",imp,&
+                "\n pasos =",pa,"\n ventanilla de atencion=",ven,'"];'
+
+            end if
+            current => current%next
+        end do
+
+        ! Cerrar el archivo DOT
+        write(unit, *) '}'
+        close(unit)
+
+        ! Generar el archivo PNG utilizando Graphviz
+        call system('dot -Tpdf ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.pdf')
+
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.pdf'
+
+    end subroutine graficar_por_nombre
+
 
     subroutine push(this, value)
         class(lista_simple_atendidos), intent(inout) :: this
@@ -168,7 +268,7 @@ contains
             pa= current%total_pasos
             ven= current%num_ventanilla
 
-            write(unit, *) '    "Node', count, '" [label="', "Ventanilla ",current%name_cliente, &
+            write(unit, *) '    "Node', count, '" [label="',current%name_cliente, &
             "\n Img_g =",img,"\n Img_p =",imp,&
             "\n pasos =",pa,"\n ventanilla =",ven,'"];'
 

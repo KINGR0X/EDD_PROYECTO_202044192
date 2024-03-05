@@ -29,7 +29,7 @@ program main
     type(json_core) :: jsonc  ! Se declara una variable del tipo json_core para acceder a las funciones básicas de JSON
     character(:), allocatable :: nombre
     integer :: img_g,img_p
-    character(len=100) :: filename
+    character(len=100) :: filename, cliente_a_graficar
     integer :: i, size       
     logical :: found
 
@@ -55,12 +55,13 @@ program main
             case(1)
                 ! El usuario ingresa la direccion del JSON
                 print *, "=== Ingrese la direccion del archivo JSON: ==="
-                ! read(*, '(A100)') filename
-                filename= "C:\Users\elian\Downloads\entrada\entrada.json"
+                read(*, '(A100)') filename
+                ! filename= "C:\Users\elian\Downloads\entrada\entrada.json"
 
                 call json%initialize()    ! Se inicializa el módulo JSON
                 call json%load(filename=trim(filename))  !se carga el archivo de entrada Json
                 ! call json%print()         ! Imprimir
+                print *, "Archivo cargado exitosamente."
                 
                 call json%info('',n_children=size)
 
@@ -132,7 +133,17 @@ program main
                 call abrirpdf()
 
             case(5)
-                print *, "Reportes"
+                !Ingrese el nombre del cliente que desea graficar
+                print *, "=== Ingrese el nombre del cliente del que desea obtener la informacion ==="
+                read(*, '(A100)') cliente_a_graficar
+                
+                ! print *, "Reporte del cliente ", cliente_a_graficar
+
+                call lista_c_atendidos%graficar_por_nombre("reporte_cliente.dot",cliente_a_graficar)
+                
+
+                call lista_c_atendidos%graficar_nodo_max_pasos("cliente_mas_pasos.dot")
+                call abrirReporte()
                 
             case(6)
                 print *, "Nombre: Elian Angel Fernando Reyes Yac"
@@ -160,6 +171,17 @@ contains
         print *, "7. Salir"
         print *, "=============================="
     end subroutine mostrarMenu
+
+    subroutine abrirReporte()
+        character(len=100) :: command
+
+        ! Reemplaza 'nombre_archivo.pdf' con la ruta de tu archivo PDF
+        command = "reporte_cliente.dot.pdf"
+        call system(command)
+        command = "cliente_mas_pasos.dot.pdf"
+        call system(command)
+
+    end subroutine abrirReporte
 
     subroutine abrirpdf()
         character(len=100) :: command

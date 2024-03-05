@@ -2,6 +2,10 @@
  label= "Lista ventanillas";
      node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
      "Node           1 " [label="Ventanilla            1 "];
+ subgraph cluster_cAndresC1                                                                                            {
+     "Node_c           1 " [label="Andres C1\n Img_g =           1 \n Img_p =           1 "];
+     "Node_c           1 " -> "Node           1 ";
+ }
      "Node           1 " -> "Node           2 ";
      "Node           2 " [label="Ventanilla            2 "];
  }

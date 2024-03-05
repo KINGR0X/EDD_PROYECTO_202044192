@@ -2,6 +2,4 @@
  label= "Cola de impresoras";
      node [shape=box, style=filled, color=black, fillcolor=mediumpurple];
      "Node           0 " [label="Impresora pequeña"];
-     "Node           1 " [label="Imagen Pequena"];
-     "Node           1 " -> "Node           0 ";
  }

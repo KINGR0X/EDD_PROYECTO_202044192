@@ -1,7 +1,4 @@
  digraph lista_atendidos {
  label= "Lista clientes atendidos";
      node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
-     "Node           1 " [label="Ventanilla Andres C1\n Img_g =           1 \n Img_p =           1 \n pasos =           7 \n ventanilla =           1 "];
-     "Node           1 " -> "Node           2 ";
-     "Node           2 " [label="Ventanilla Juan Perez C2\n Img_g =           3 \n Img_p =           0 \n pasos =          10 \n ventanilla =           2 "];
  }
