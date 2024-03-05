@@ -1,0 +1,9 @@
+ digraph lisat_espera {
+ label= "Lista de espera";
+     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
+     "Node           3 " [label="Luis Higueros c3\n Img_g =           0 \n Img_p =           2 "];
+     "Node           3 " -> "Node           3 ";
+     "Node           3 " -> "Node           3 ";
+     "Node_img           2 " [label="Imagen Pequena"];
+     "Node_img           2 " -> "Node           3 ";
+ }

@@ -20,6 +20,7 @@ module lista_clientes_atentidos
         procedure :: delete
         procedure :: search
         procedure :: print_pointers
+        procedure :: graficar
     end type lista_simple_atendidos
 
 contains
@@ -142,6 +143,58 @@ contains
             current => current%next
         end do 
     end subroutine print
+
+    subroutine graficar(this,filename)
+        class(lista_simple_atendidos), intent(in) :: this
+        character(len=*), intent(in) :: filename
+        type(node), pointer :: current
+
+        integer :: img, imp,pa,ven
+        integer :: unit
+        integer :: count
+
+        open(unit, file=filename, status='replace')
+        write(unit, *) 'digraph lista_atendidos {'
+        write(unit, *) 'label= "Lista clientes atendidos";'
+        write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];' ! Aplicar atributos a todos los nodos
+
+        current => this%head
+        count=0
+
+        do while (associated(current))
+            count = count + 1
+            img= current%img_g
+            imp= current%img_p
+            pa= current%total_pasos
+            ven= current%num_ventanilla
+
+            write(unit, *) '    "Node', count, '" [label="', "Ventanilla ",current%name_cliente, &
+            "\n Img_g =",img,"\n Img_p =",imp,&
+            "\n pasos =",pa,"\n ventanilla =",ven,'"];'
+
+            if (associated(current%next)) then
+                write(unit, *) '    "Node', count, '" -> "Node', count+1, '";'
+            end if
+
+            ! print *, 'Index nodo:', current%value
+            ! print *, 'Name Cliente:', current%name_cliente
+            ! print *, 'Numero Ventanilla:', current%num_ventanilla
+            ! print *, 'Imagen G:', current%img_g
+            ! print *, 'Imagen P:', current%img_p
+            ! print *, 'Total Pasos:', current%total_pasos
+            current => current%next
+        end do 
+
+        ! Cerrar el archivo DOT
+        write(unit, *) '}'
+        close(unit)
+    
+        ! Generar el archivo PNG utilizando Graphviz
+        call system('dot -Tpdf ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.pdf')
+    
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.pdf'
+
+    end subroutine graficar
 
     subroutine print_pointers(this)
         class(lista_simple_atendidos), intent(in) :: this

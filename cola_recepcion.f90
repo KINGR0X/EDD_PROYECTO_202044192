@@ -130,6 +130,7 @@ contains
 
         open(unit, file=filename, status='replace')
         write(unit, *) 'digraph Cola_recepcion {'
+        write(unit, *) 'label= "Cola de Recepcion";'
         write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=gold];' ! Aplicar atributos a todos los nodos
         
         ! Escribir nodos y conexiones
@@ -147,14 +148,6 @@ contains
             end if
             current => current%next
         end do 
-
-        ! do while (associated(current))
-        !     print *, current%value
-        !     print *, "img_g: ", current%img_g
-        !     print *, "img_p: ", current%img_p
-        !     print *, "---------------"
-        !     current => current%next
-        ! end do 
 
         ! Cerrar el archivo DOT
         write(unit, *) '}'

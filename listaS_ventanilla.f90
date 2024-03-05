@@ -44,6 +44,7 @@ module List_of_list_vent
         procedure :: return_num_ventanilla
         procedure :: return_num_imgG
         procedure :: return_num_imgP
+        procedure :: graficar 
     end type List_of_list
 
 contains
@@ -273,6 +274,117 @@ contains
             aux => aux%next
         end do
     end subroutine printList
+
+    subroutine graficar(this,filename)
+        class(List_of_list) ::this        
+        character(len=*), intent(in) :: filename
+        character(len=100) :: character_sin
+        type(node), pointer :: aux
+        type(sub_node), pointer :: current
+        logical :: first_img
+
+        integer :: img, imp
+
+        integer :: unit
+        integer :: count, count_pila
+
+        open(unit, file=filename, status='replace')
+        write(unit, *) 'digraph lista_ventanillas {'
+        write(unit, *) 'label= "Lista ventanillas";'
+        write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];' ! Aplicar atributos a todos los nodos
+        
+        ! Escribir nodos y conexiones
+        aux => this%head
+        count = 0
+        count_pila = 0
+        
+
+        do while(associated(aux))
+            count = count + 1
+            first_img = .true.
+
+            write(unit, *) '    "Node', count, '" [label="', "Ventanilla ",aux%index,'"];'
+
+            if (len_trim(trim(adjustl(aux%name_client))) > 0 ) then
+                img= aux%num_imgG_original
+                imp= aux%num_imgP_original
+
+                character_sin = quitar_espacios_en_medio(aux%name_client)
+
+                write(unit, *) 'subgraph cluster_c',character_sin,  "{"
+                write(unit, *) '    "Node_c', count, '" [label="', aux%name_client,"\n Img_g =",img,"\n Img_p =",imp,'"];'
+                write(unit, *) '    "Node_c', count, '" -> "Node', count, '";'
+                write(unit, *) '}'
+
+            end if
+
+            if (associated(aux%next)) then
+                write(unit, *) '    "Node', count, '" -> "Node', count+1, '";'
+            end if
+
+   
+            ! Graficar la pila
+            if (this%check_stack_size(count) > 0) then
+
+                ! Imprimir información de la pila asociada al nodo
+                current => aux%stack
+                do while (associated(current))
+                    count_pila = count_pila + 1
+
+                    if (first_img) then
+                        write(unit, *) '    "Node_img', count_pila, '" [label="',current%value,'"];'
+                        write(unit, *) '    "Node_img', count_pila, '" -> "Node', count, '";'
+                        first_img = .false.
+                    else
+                        write(unit, *) '    "Node_img', count_pila, '" [label="',current%value,'"];'
+                        write(unit, *) '    "Node_img', count_pila, '" -> "Node_img', count_pila-1, '";'
+                    end if
+
+                    !se mira si es la primera imagen de la pila
+                    !write(unit, *) '    "Node_img', count_pila, '" [label="',current%value,'"];'
+                    !write(unit, *) '    "Node_img', count_pila, '" -> "Node', count, '";'
+
+                    !write(unit, *) '    "Node_img', count_pila, '" [label="',current%value,'"];'
+                    !write(unit, *) '    "Node_img', count_pila, '" -> "Node', count, '";'
+
+                    current => current%next
+                end do
+            end if
+
+            aux => aux%next
+        end do
+
+        ! Cerrar el archivo DOT
+        write(unit, *) '}'
+        close(unit)
+    
+        ! Generar el archivo PNG utilizando Graphviz
+        call system('dot -Tpdf ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.pdf')
+    
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.pdf'
+
+    end subroutine graficar
+
+    function quitar_espacios_en_medio(cadena_original) result(cadena_sin_espacios)
+        implicit none
+        character(len=*) :: cadena_original
+        character(len=100) :: cadena_sin_espacios
+        integer :: i, longitud
+
+        ! Obtener la longitud de la cadena original
+        longitud = len_trim(cadena_original)
+
+        ! Inicializar la cadena sin espacios
+        cadena_sin_espacios = ""
+
+        ! Iterar sobre la cadena y agregar caracteres no espaciales a la nueva cadena
+        do i = 1, longitud
+            if (cadena_original(i:i) /= ' ') then
+                cadena_sin_espacios = TRIM(cadena_sin_espacios) // cadena_original(i:i)
+            end if
+        end do
+
+    end function quitar_espacios_en_medio
 
     function buscar_nodo_desocupado(self) result(index)
         class(List_of_list), intent(in) :: self

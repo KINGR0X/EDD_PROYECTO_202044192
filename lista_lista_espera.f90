@@ -40,9 +40,35 @@ module lista_clientes_espera
         procedure :: get_total_pasos
         procedure :: verificar_completo
         procedure :: get_min_value
+        procedure :: graficar
+        procedure :: get_stack_size
+        procedure :: print_pointers
     end type lista_circular
 
 contains
+
+    subroutine print_pointers(self)
+        class(lista_circular), intent(inout) :: self
+        type(node), pointer :: current
+
+        if (.not. associated(self%head)) then
+            print *, "La lista está vacía."
+            return
+        end if
+
+        current => self%head
+
+        do while (associated(current))
+            print *, 'Index nodo:', current%value
+            print *, 'Prev:', current%prev%value
+            print *, 'Next:', current%next%value
+            print *, ""
+
+            if (associated(current%next, self%head)) exit  ! Salir al completar un ciclo (lista circular)
+            current => current%next       
+        end do
+    end subroutine print_pointers
+
 
     function get_min_value(self) result(min_value)
         class(lista_circular), intent(in) :: self
@@ -204,7 +230,7 @@ contains
         new%n_imgG_original= img_g
         new%n_imgP_original= img_p
 
-        new_subnode%value = '' ! Inicializar la pila vacía
+        new_subnode%value = 'vacio' ! Inicializar la pila vacía
 
         new%stack => new_subnode
 
@@ -381,6 +407,109 @@ contains
             current => current%next       
         end do
     end subroutine print
+
+    function get_stack_size(self, index) result(stack_size)
+        class(lista_circular), intent(in) :: self
+        integer, intent(in) :: index
+        type(node), pointer :: current
+        type(sub_node), pointer :: stack
+        integer :: stack_size
+
+        stack_size = 0
+
+        current => self%head
+
+        do while (associated(current))
+            if (current%value == index) then
+                if (associated(current%stack)) then
+                    stack => current%stack
+                    do while (associated(stack))
+                        stack_size = stack_size + 1
+                        if (associated(stack%next)) then
+                            stack => stack%next
+                        else
+                            exit
+                        end if
+                    end do
+                end if
+                exit
+            end if
+            if (associated(current%next, self%head)) exit
+            current => current%next
+        end do
+    end function get_stack_size
+
+    subroutine graficar(self,filename)
+        class(lista_circular), intent(inout) :: self
+        character(len=*), intent(in) :: filename
+        type(node), pointer :: current
+        type(sub_node), pointer :: stack
+        logical :: first_img
+
+        integer :: img, imp
+
+        integer :: unit
+        integer :: count, count_pila
+
+        open(unit, file=filename, status='replace')
+        write(unit, *) 'digraph lisat_espera {'
+        write(unit, *) 'label= "Lista de espera";'
+        write(unit, *) '    node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];'
+
+        current => self%head
+        count = 0
+        count_pila = 0
+
+        do while (associated(current))
+            count = count + 1
+            first_img = .true.
+
+            img= current%n_imgG_original
+            imp= current%n_imgP_original
+
+            write(unit, *) '    "Node', current%value, '" [label="', current%name_cliente,"\n Img_g =",img,"\n Img_p =",imp,'"];'
+
+            !union de nodos
+
+            write(unit, *) '    "Node', current%value, '" -> "Node', current%next%value, '";'
+            write(unit, *) '    "Node', current%value, '" -> "Node', current%prev%value, '";'
+
+
+
+            ! Graficar la pila
+            stack=> current%stack
+            do while (associated(stack))
+                count_pila = count_pila + 1
+                    
+                if (.not.(stack%value=="vacio")) then
+                    if (first_img) then
+                        write(unit, *) '    "Node_img', count_pila, '" [label="',stack%value,'"];'
+                        write(unit, *) '    "Node_img', count_pila, '" -> "Node', current%value, '";'
+                        first_img = .false.
+                    else
+                        write(unit, *) '    "Node_img', count_pila, '" [label="',stack%value,'"];'
+                        write(unit, *) '    "Node_img', count_pila, '" -> "Node_img', count_pila-1, '";'
+                    end if
+
+                end if
+
+                stack => stack%next
+            end do
+                
+            if (associated(current%next, self%head)) exit  ! Salir
+            current => current%next     
+        end do
+
+        ! Cerrar el archivo DOT
+        write(unit, *) '}'
+        close(unit)
+    
+        ! Generar el archivo PNG utilizando Graphviz
+        call system('dot -Tpdf ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.pdf')
+    
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.pdf'
+
+    end subroutine graficar
 
     function verificar_completo(self, index) result(complete)
         class(lista_circular), intent(inout) :: self

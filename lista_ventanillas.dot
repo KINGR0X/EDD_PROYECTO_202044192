@@ -1,0 +1,7 @@
+ digraph lista_ventanillas {
+ label= "Lista ventanillas";
+     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
+     "Node           1 " [label="Ventanilla            1 "];
+     "Node           1 " -> "Node           2 ";
+     "Node           2 " [label="Ventanilla            2 "];
+ }

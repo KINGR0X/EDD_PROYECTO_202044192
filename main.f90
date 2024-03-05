@@ -120,30 +120,25 @@ program main
 
             case(3)
                 print *, "Estado en memoria de las estructuras"
-                call cola_recep%print()
-                print *, " "
-                print *, "Lista ventanillas: "
-                call list_ventanillas%printList()
-                print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXX COLAS DE IMPRESION XXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                call cola_img_grande%print()
-                call cola_img_pequena%print()
-                
-                print *, '++++++++++++++++++++++++++++ LISTA DE ESPERA +++++++++++++++++++++++++++++++'
-                call lista_espera%print()
-                print *, "==========================================================================="
-                print *, "Numero de pasos: ", num_pasos
-
-                print *, "|||||||||||||||||||||||||||| CLIENTES ATENDIDOS ||||||||||||||||||||||||||||"
-                call lista_c_atendidos%print()
-                
-            case(4)
-                print *, "Reportes"
                 call cola_recep%graficar("cola_recepcion.dot")
+                call list_ventanillas%graficar("lista_ventanillas.dot")
+                call cola_img_grande%graficar("cola_img_grande.dot", "Impresora Grande")
+                call cola_img_pequena%graficar("cola_img_pequena.dot", "Impresora pequeña")
+
+                call lista_espera%graficar("lista_espera.dot")
+                call lista_c_atendidos%graficar("lista_c_atendidos.dot")
+            
+            case(4)
+                call abrirpdf()
+
             case(5)
+                print *, "Reportes"
+                
+            case(6)
                 print *, "Nombre: Elian Angel Fernando Reyes Yac"
                 print *, "Carnet: 202044192"
                 print *, "Curso: Estructura de Datos"
-            case(6)
+            case(7)
                 exit ! Salir del programa
             case default
                 print *, "Opcion invalida. Por favor, seleccione una opcion valida."
@@ -159,11 +154,30 @@ contains
         print *, "1. Ingresar parametros iniciales"
         print *, "2. Ejecutar paso"
         print *, "3. Estado en memoria de las estructuras"
-        print *, "4. Reportes"
-        print *, "5. Acerca del estudiante"
-        print *, "6. Salir"
+        print *, "4. Abrir archivos PDF"
+        print *, "5. Reportes"
+        print *, "6. Acerca del estudiante"
+        print *, "7. Salir"
         print *, "=============================="
     end subroutine mostrarMenu
+
+    subroutine abrirpdf()
+        character(len=100) :: command
+
+        ! Reemplaza 'nombre_archivo.pdf' con la ruta de tu archivo PDF
+        command = "cola_recepcion.dot.pdf"
+        call system(command)
+        command = "lista_ventanillas.dot.pdf"
+        call system(command)
+        command = "cola_img_grande.dot.pdf"
+        call system(command)
+        command = "cola_img_pequena.dot.pdf"
+        call system(command)
+        command = "lista_espera.dot.pdf"
+        call system(command)
+        command = "lista_c_atendidos.dot.pdf"
+        call system(command)
+    end subroutine abrirpdf
 
     !subroutine para asignar cliente a ventanilla
     subroutine cliente_a_ventanilla()
