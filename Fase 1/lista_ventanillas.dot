@@ -1,0 +1,19 @@
+ digraph lista_ventanillas {
+ label= "Lista ventanillas";
+     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
+     "Node           1 " [label="Ventanilla            1 "];
+ subgraph cluster_cAntonioJimenez                                                                                      {
+     "Node_c           1 " [label="Antonio Jimenez\n Img_g =           1 \n Img_p =           3 "];
+     "Node_c           1 " -> "Node           1 ";
+ }
+     "Node           1 " -> "Node           2 ";
+     "Node_img           1 " [label="Imagen Grande"];
+     "Node_img           1 " -> "Node           1 ";
+     "Node           2 " [label="Ventanilla            2 "];
+     "Node           2 " -> "Node           3 ";
+     "Node           3 " [label="Ventanilla            3 "];
+ subgraph cluster_cElenaGonzalez                                                                                       {
+     "Node_c           3 " [label="Elena Gonzalez\n Img_g =           1 \n Img_p =           1 "];
+     "Node_c           3 " -> "Node           3 ";
+ }
+ }

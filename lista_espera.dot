@@ -1,4 +1,0 @@
- digraph lisat_espera {
- label= "Lista de espera";
-     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
- }

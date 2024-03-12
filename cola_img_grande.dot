@@ -1,5 +1,0 @@
- digraph Cola_impresoras {
- label= "Cola de impresoras";
-     node [shape=box, style=filled, color=black, fillcolor=mediumpurple];
-     "Node           0 " [label="Impresora Grande"];
- }

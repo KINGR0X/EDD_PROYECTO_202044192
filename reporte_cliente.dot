@@ -1,5 +1,0 @@
- digraph lista_atendidos {
- label= "Reporte cliente";
-     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
-     "Node           1 " [label="Andres C1\n Img_g =           1 \n Img_p =           1 \n pasos =           7 \n ventanilla de atencion=           1 "];
- }

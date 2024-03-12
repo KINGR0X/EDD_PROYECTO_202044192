@@ -1,0 +1,25 @@
+ digraph Cola_impresoras {
+ label= "Cola de impresoras";
+     node [shape=box, style=filled, color=black, fillcolor=mediumpurple];
+     "Node           0 " [label="Impresora pequeña"];
+     "Node           1 " [label="Imagen Pequena"];
+     "Node           1 " -> "Node           0 ";
+     "Node           2 " [label="Imagen Pequena"];
+     "Node           2 " -> "Node           1 ";
+     "Node           3 " [label="Imagen Pequena"];
+     "Node           3 " -> "Node           2 ";
+     "Node           4 " [label="Imagen Pequena"];
+     "Node           4 " -> "Node           3 ";
+     "Node           5 " [label="Imagen Pequena"];
+     "Node           5 " -> "Node           4 ";
+     "Node           6 " [label="Imagen Pequena"];
+     "Node           6 " -> "Node           5 ";
+     "Node           7 " [label="Imagen Pequena"];
+     "Node           7 " -> "Node           6 ";
+     "Node           8 " [label="Imagen Pequena"];
+     "Node           8 " -> "Node           7 ";
+     "Node           9 " [label="Imagen Pequena"];
+     "Node           9 " -> "Node           8 ";
+     "Node          10 " [label="Imagen Pequena"];
+     "Node          10 " -> "Node           9 ";
+ }

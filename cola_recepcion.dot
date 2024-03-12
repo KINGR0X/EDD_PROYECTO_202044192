@@ -1,7 +1,0 @@
- digraph Cola_recepcion {
- label= "Cola de Recepcion";
-     node [shape=box, style=filled, color=blue, fillcolor=gold];
-     "Node           1 " [label="Juan Perez C2\n Img_g =           3 \n Img_p =           0 "];
-     "Node           1 " -> "Node           2 ";
-     "Node           2 " [label="Luis Higueros c3\n Img_g =           0 \n Img_p =           2 "];
- }

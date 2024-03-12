@@ -1,0 +1,4 @@
+ digraph Cola_recepcion {
+ label= "Cola de Recepcion";
+     node [shape=box, style=filled, color=blue, fillcolor=gold];
+ }

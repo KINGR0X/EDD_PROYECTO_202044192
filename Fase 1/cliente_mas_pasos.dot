@@ -1,0 +1,5 @@
+ digraph lista_atendidos {
+ label= "Reporte cliente";
+     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
+     "Node1" [label="Maria Garcia\n Img_g =           2 \n Img_p =           2 \n pasos =          17 \n ventanilla de atencion=           2 "];
+ }

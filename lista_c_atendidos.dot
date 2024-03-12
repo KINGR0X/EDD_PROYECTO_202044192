@@ -1,4 +1,0 @@
- digraph lista_atendidos {
- label= "Lista clientes atendidos";
-     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
- }

@@ -1,5 +1,0 @@
- digraph lista_atendidos {
- label= "Reporte cliente";
-     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
-     "Node1" [label="Luis Higueros c3\n Img_g =           0 \n Img_p =           2 \n pasos =          12 \n ventanilla de atencion=           1 "];
- }
