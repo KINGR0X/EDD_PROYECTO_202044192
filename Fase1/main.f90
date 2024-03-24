@@ -84,7 +84,7 @@ program main
                     end if
                 end do
 
-                call json%destroy()                    ! Se finaliza el módulo JSON
+                call json%destroy() ! Se finaliza el módulo JSON
 
                 ! Ingresar la cantidad de ventanillas
                 print *, " "
