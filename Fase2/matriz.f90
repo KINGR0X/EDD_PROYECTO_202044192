@@ -36,7 +36,6 @@ module matrix_m
         procedure :: printColumnHeaders
         procedure :: getValue
         procedure :: graficar
-        ! procedure :: printRowHeaders
     end type
 
 contains
@@ -74,9 +73,9 @@ contains
 
                 write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0, '" [label="',fila,'"]'
 
-                ! ! Union de encabezados con los nodos de la fila
-                ! write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node', 0,'_',fila,'"'
-                ! write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node', 0,'_',fila,'"[dir=back]'
+                ! Union de encabezados con los nodos de la fila
+                write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node', 0,'_',fila,'"'
+                write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node', 0,'_',fila,'"[dir=back]'
 
 
 
@@ -108,8 +107,8 @@ contains
             write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" [label="',fila,'"]'
 
             !Union de las filas 
-            ! write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node', fila,'_',colum,'"'
-            ! write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node', fila,'_',colum,'"[dir=back]'
+            write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node', fila,'_',colum,'"'
+            write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node', fila,'_',colum,'"[dir=back]'
 
             !Union con flechas a la derecha
             if(.not. fila== self%height) then
@@ -123,8 +122,8 @@ contains
 
                 if(.not. val%exists) then
                     ! write(*, fmt='(I3)', advance='no') 0
-                    ! write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label="',colum,'", group=', fila,']'
-                    ! write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label="", group=', fila,']'
+                    write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label="',colum,'", group=', fila,']'
+                    write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label="", group=', fila,']'
 
                 else
                     ! write(*, fmt='(L3)', advance='no') val%value
@@ -133,29 +132,29 @@ contains
 
                 end if
 
-                ! if (.not. colum==0) then
-                !     !Union de las filas izquierda y derecha
-                !     write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila,'_',colum,'"'
-                !     write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila,'_',colum,'"[dir=back]'
-                ! end if
+                if (.not. colum==0) then
+                    !Union de las filas izquierda y derecha
+                    write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila,'_',colum,'"'
+                    write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila,'_',colum,'"[dir=back]'
+                end if
 
-                ! ! Union arriba y abajo
-                ! if (.not. colum==0 ) then
+                ! Union arriba y abajo
+                if (.not. colum==0 ) then
 
-                !     if (.not. fila==self%height) then
-                !     ! Union arriba y abajo
-                !         write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila+1,'_',colum-1,'"'
-                !         write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila+1,'_',colum-1,'"[dir=back]'
-                !     end if
-                ! end if
+                    if (.not. fila==self%height) then
+                    ! Union arriba y abajo
+                        write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila+1,'_',colum-1,'"'
+                        write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila+1,'_',colum-1,'"[dir=back]'
+                    end if
+                end if
 
-                ! ! Union arriba y abajo del ultimo nodo
-                ! if (colum==self%width) then
-                !     if (.not. fila==self%height) then
-                !         write(unit, '(*(g0))') '"Node', fila,"_",colum,'" -> "Node', fila+1,'_',colum,'"'
-                !         write(unit, '(*(g0))') '"Node', fila,"_",colum,'" -> "Node', fila+1,'_',colum,'"[dir=back]'
-                !     end if
-                ! end if
+                ! Union arriba y abajo del ultimo nodo
+                if (colum==self%width) then
+                    if (.not. fila==self%height) then
+                        write(unit, '(*(g0))') '"Node', fila,"_",colum,'" -> "Node', fila+1,'_',colum,'"'
+                        write(unit, '(*(g0))') '"Node', fila,"_",colum,'" -> "Node', fila+1,'_',colum,'"[dir=back]'
+                    end if
+                end if
 
             end do
 
@@ -166,12 +165,10 @@ contains
             write(unit, '(*(g0))', advance="no") '{rank=same;'
             c=0
             do c=-1, self%width
-                if (val%exists) then
-                    if (c==-1)then 
-                        write(unit, '(*(g0))',advance="no") '"Node_fila_', f-1, '_', c+1, '";'
-                    else
-                        write(unit, '(*(g0))',advance="no") '"Node', f,"_",c,'";'
-                    end if
+                if (c==-1)then 
+                    write(unit, '(*(g0))',advance="no") '"Node_fila_', f-1, '_', c+1, '";'
+                else
+                    write(unit, '(*(g0))',advance="no") '"Node', f,"_",c,'";'
                 end if
             end do
             write(unit, '(*(g0))',advance="yes") '};'
@@ -423,24 +420,27 @@ contains
     end function getValue
 end module matrix_m
 
-program main
-    use matrix_m
-    implicit none
+! program main
+!     use matrix_m
+!     implicit none
     
-    type(matrix) :: m
-    !             i, j
-    !            fila, columna
-    call m%insert(1, 5, "#000001")
-    call m%insert(0, 3, "#000000")  
-    call m%insert(1, 1, "#000000")
-    call m%insert(4, 1, "#000041")
-    call m%insert(5, 3, "#000000")
-    call m%insert(5, 10, "#000000")
-    call m%insert(1, 1, "#000000")
-    call m%insert(3, 1, "#000000")
+!     type(matrix) :: m
+!     !             i, j
+!     !            fila, columna
+!     call m%insert(1, 5, "#000001")
+!     call m%insert(0, 3, "#FF0000")  
+!     call m%insert(1, 1, "#000000")
+!     call m%insert(4, 1, "#000041")
+!     call m%insert(5, 3, "#000000")
+!     call m%insert(5, 10, "#000000")
+!     call m%insert(1, 1, "#000000")
+!     call m%insert(3, 1, "#000000")
 
 
-    call m%print()
+!     call m%print()
 
-    call m%graficar("capas.dot")
-end program main
+!     call m%graficar("capas.dot")
+
+
+
+! end program main
