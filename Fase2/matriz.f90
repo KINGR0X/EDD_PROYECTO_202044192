@@ -35,10 +35,168 @@ module matrix_m
         procedure :: print
         procedure :: printColumnHeaders
         procedure :: getValue
+        procedure :: graficar
         ! procedure :: printRowHeaders
     end type
 
 contains
+
+    subroutine graficar(self,filename)
+        class(matrix), intent(inout) :: self  
+        character(len=*), intent(in) :: filename
+        integer :: fila,f
+        integer :: colum,c
+        type(node), pointer :: aux
+        type(node_val) :: val
+        integer :: unit
+        
+
+        open(unit, file=filename, status='replace')
+        write(unit, *) 'digraph Matriz {'
+        write(unit, *) '    node [shape=box, style=filled];' ! Aplicar atributos a todos los nodos
+
+        aux => self%root%down
+
+        ! Todo se grafica fila por fila -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        ! Se imprimen los encabezados de las columnas
+        do fila=-1, self%width
+            if (fila == -1) then
+                write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0, '" [label="root"]'
+
+                ! Union con el primer nodo de la fila
+                write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node_fila_-1_0','"' 
+                write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node_fila_-1_0','"[dir=back]' 
+                
+            else
+                write(unit, '(*(g0))') '"Node_encabezado_', fila-1, '_', 0,'" -> "Node_encabezado_', fila, '_', 0, '"'
+                write(unit, '(*(g0))') '"Node_encabezado_', fila-1, '_', 0,'" -> "Node_encabezado_', fila, '_', 0, '"[dir=back]' 
+
+                write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0, '" [label="',fila,'"]'
+
+                ! ! Union de encabezados con los nodos de la fila
+                ! write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node', 0,'_',fila,'"'
+                ! write(unit, '(*(g0))') '"Node_encabezado_', fila, '_', 0,'" -> "Node', 0,'_',fila,'"[dir=back]'
+
+
+
+            end if
+        end do
+
+        ! Se establecen que nodos conforman una fila
+        write(unit, '(*(g0))') ' '
+        write(unit, '(*(g0))', advance="no") '{rank=same;'
+        do fila=-1, self%width
+            write(unit, '(*(g0))',advance="no") '"Node_encabezado_', fila, '_', 0, '";'
+        end do
+        write(unit, '(*(g0))',advance="yes") '};'
+
+        ! salto de linea para que este tan pegado
+        write(unit, '(*(g0))') ' '
+
+
+        ! Se inicializa j
+        fila=0
+        f=0
+
+        do fila = 0, self%height
+            f=fila
+            colum = 0
+            ! write(*, fmt='(I3)', advance='no') i
+
+            ! Inicio de la fila
+            write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" [label="',fila,'"]'
+
+            !Union de las filas 
+            ! write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node', fila,'_',colum,'"'
+            ! write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node', fila,'_',colum,'"[dir=back]'
+
+            !Union con flechas a la derecha
+            if(.not. fila== self%height) then
+                write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node_fila_', fila,'_',colum,'"'
+                write(unit, '(*(g0))') '"Node_fila_', fila-1,"_",colum,'" -> "Node_fila_', fila,'_',colum,'"[dir=back]'
+            end if
+
+            
+            do colum = 0, self%width
+                val = self%getValue(fila,colum)
+
+                if(.not. val%exists) then
+                    ! write(*, fmt='(I3)', advance='no') 0
+                    ! write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label="',colum,'", group=', fila,']'
+                    ! write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label="", group=', fila,']'
+
+                else
+                    ! write(*, fmt='(L3)', advance='no') val%value
+
+                    write(unit, '(*(g0))') '"Node', fila,"_",colum,'" [label= " ", fillcolor="',val%value,'", group=', fila,']'
+
+                end if
+
+                ! if (.not. colum==0) then
+                !     !Union de las filas izquierda y derecha
+                !     write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila,'_',colum,'"'
+                !     write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila,'_',colum,'"[dir=back]'
+                ! end if
+
+                ! ! Union arriba y abajo
+                ! if (.not. colum==0 ) then
+
+                !     if (.not. fila==self%height) then
+                !     ! Union arriba y abajo
+                !         write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila+1,'_',colum-1,'"'
+                !         write(unit, '(*(g0))') '"Node', fila,"_",colum-1,'" -> "Node', fila+1,'_',colum-1,'"[dir=back]'
+                !     end if
+                ! end if
+
+                ! ! Union arriba y abajo del ultimo nodo
+                ! if (colum==self%width) then
+                !     if (.not. fila==self%height) then
+                !         write(unit, '(*(g0))') '"Node', fila,"_",colum,'" -> "Node', fila+1,'_',colum,'"'
+                !         write(unit, '(*(g0))') '"Node', fila,"_",colum,'" -> "Node', fila+1,'_',colum,'"[dir=back]'
+                !     end if
+                ! end if
+
+            end do
+
+            ! === Se establecen que nodos conforman una fila ===
+
+            ! salto de linea para que este tan pegado
+            write(unit, '(*(g0))') ' '
+            write(unit, '(*(g0))', advance="no") '{rank=same;'
+            c=0
+            do c=-1, self%width
+                if (val%exists) then
+                    if (c==-1)then 
+                        write(unit, '(*(g0))',advance="no") '"Node_fila_', f-1, '_', c+1, '";'
+                    else
+                        write(unit, '(*(g0))',advance="no") '"Node', f,"_",c,'";'
+                    end if
+                end if
+            end do
+            write(unit, '(*(g0))',advance="yes") '};'
+
+            write(unit, '(*(g0))') ' '
+
+            ! {rank=same;"Node_fila_-1_0";"Node0_0","Node0_1","Node0_2","Node0_3","Node0_4","Node0_5","Node0_6","Node0_7","Node0_8","Node0_9","Node0_10";};
+
+        end do
+
+
+        ! Cerrar el archivo DOT
+        write(unit, *) '}'
+        close(unit)
+    
+        ! Generar el archivo PNG utilizando Graphviz
+        call system('dot -Tpng ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.png')
+    
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.png'
+
+
+    end subroutine graficar
+
+
+
     subroutine insert(self, i, j, value) 
         class(matrix), intent(inout) :: self  
         integer, intent(in) :: i
@@ -270,10 +428,12 @@ program main
     implicit none
     
     type(matrix) :: m
+    !             i, j
+    !            fila, columna
     call m%insert(1, 5, "#000001")
     call m%insert(0, 3, "#000000")  
     call m%insert(1, 1, "#000000")
-    call m%insert(4, 1, "#000000")
+    call m%insert(4, 1, "#000041")
     call m%insert(5, 3, "#000000")
     call m%insert(5, 10, "#000000")
     call m%insert(1, 1, "#000000")
@@ -281,4 +441,6 @@ program main
 
 
     call m%print()
+
+    call m%graficar("capas.dot")
 end program main

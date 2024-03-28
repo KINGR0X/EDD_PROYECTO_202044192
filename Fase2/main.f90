@@ -1,6 +1,6 @@
 program main
     use json_module
-
+    use matrix_m
 
     implicit none
     
@@ -24,6 +24,9 @@ program main
 
     integer :: i, p, size, pixels  
     logical :: found
+
+    ! Matriz dispersa para las capas
+    type(matrix) :: matriz_c
 
     
     integer :: opcion
@@ -102,7 +105,9 @@ contains
                     print *, "Navegando y gestionando imágenes..."
                 case(3)
                     print *, "Cargando masivamente capas..."
+
                     call cargarCapas()
+                    call matriz_c%graficar("capas.dot")
                 case(4)
                     print *, "Cargando masivamente imágenes..."
                 case(5)
@@ -229,9 +234,8 @@ contains
                     end if
                 end if
 
-                ! call matriz%insert(colum, row, color)
-
-                print *, "Capa: ", id_capa, "Color: ", color, "Columna: ", colum, "Fila: ", row
+                call matriz_c%insert(colum, row, color)
+                ! print *, "Capa: ", id_capa, "Color: ", color, "Columna: ", colum, "Fila: ", row
 
             end do
         end do

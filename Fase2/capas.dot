@@ -1,0 +1,83 @@
+ digraph Matriz {
+     node [shape=box, style=filled];
+"Node_encabezado_-1_0" [label="root"]
+"Node_encabezado_-1_0" -> "Node_fila_-1_0"
+"Node_encabezado_-1_0" -> "Node_fila_-1_0"[dir=back]
+"Node_encabezado_-1_0" -> "Node_encabezado_0_0"
+"Node_encabezado_-1_0" -> "Node_encabezado_0_0"[dir=back]
+"Node_encabezado_0_0" [label="0"]
+"Node_encabezado_0_0" -> "Node_encabezado_1_0"
+"Node_encabezado_0_0" -> "Node_encabezado_1_0"[dir=back]
+"Node_encabezado_1_0" [label="1"]
+"Node_encabezado_1_0" -> "Node_encabezado_2_0"
+"Node_encabezado_1_0" -> "Node_encabezado_2_0"[dir=back]
+"Node_encabezado_2_0" [label="2"]
+"Node_encabezado_2_0" -> "Node_encabezado_3_0"
+"Node_encabezado_2_0" -> "Node_encabezado_3_0"[dir=back]
+"Node_encabezado_3_0" [label="3"]
+"Node_encabezado_3_0" -> "Node_encabezado_4_0"
+"Node_encabezado_3_0" -> "Node_encabezado_4_0"[dir=back]
+"Node_encabezado_4_0" [label="4"]
+"Node_encabezado_4_0" -> "Node_encabezado_5_0"
+"Node_encabezado_4_0" -> "Node_encabezado_5_0"[dir=back]
+"Node_encabezado_5_0" [label="5"]
+"Node_encabezado_5_0" -> "Node_encabezado_6_0"
+"Node_encabezado_5_0" -> "Node_encabezado_6_0"[dir=back]
+"Node_encabezado_6_0" [label="6"]
+"Node_encabezado_6_0" -> "Node_encabezado_7_0"
+"Node_encabezado_6_0" -> "Node_encabezado_7_0"[dir=back]
+"Node_encabezado_7_0" [label="7"]
+"Node_encabezado_7_0" -> "Node_encabezado_8_0"
+"Node_encabezado_7_0" -> "Node_encabezado_8_0"[dir=back]
+"Node_encabezado_8_0" [label="8"]
+"Node_encabezado_8_0" -> "Node_encabezado_9_0"
+"Node_encabezado_8_0" -> "Node_encabezado_9_0"[dir=back]
+"Node_encabezado_9_0" [label="9"]
+"Node_encabezado_9_0" -> "Node_encabezado_10_0"
+"Node_encabezado_9_0" -> "Node_encabezado_10_0"[dir=back]
+"Node_encabezado_10_0" [label="10"]
+ 
+{rank=same;"Node_encabezado_-1_0";"Node_encabezado_0_0";"Node_encabezado_1_0";"Node_encabezado_2_0";"Node_encabezado_3_0";"Node_encabezado_4_0";"Node_encabezado_5_0";"Node_encabezado_6_0";"Node_encabezado_7_0";"Node_encabezado_8_0";"Node_encabezado_9_0";"Node_encabezado_10_0";};
+ 
+"Node_fila_-1_0" [label="0"]
+"Node_fila_-1_0" -> "Node_fila_0_0"
+"Node_fila_-1_0" -> "Node_fila_0_0"[dir=back]
+"Node0_3" [label= " ", fillcolor="#000000", group=0]
+ 
+{rank=same;};
+ 
+"Node_fila_0_0" [label="1"]
+"Node_fila_0_0" -> "Node_fila_1_0"
+"Node_fila_0_0" -> "Node_fila_1_0"[dir=back]
+"Node1_1" [label= " ", fillcolor="#000000", group=1]
+"Node1_5" [label= " ", fillcolor="#000001", group=1]
+ 
+{rank=same;};
+ 
+"Node_fila_1_0" [label="2"]
+"Node_fila_1_0" -> "Node_fila_2_0"
+"Node_fila_1_0" -> "Node_fila_2_0"[dir=back]
+ 
+{rank=same;};
+ 
+"Node_fila_2_0" [label="3"]
+"Node_fila_2_0" -> "Node_fila_3_0"
+"Node_fila_2_0" -> "Node_fila_3_0"[dir=back]
+"Node3_1" [label= " ", fillcolor="#000000", group=3]
+ 
+{rank=same;};
+ 
+"Node_fila_3_0" [label="4"]
+"Node_fila_3_0" -> "Node_fila_4_0"
+"Node_fila_3_0" -> "Node_fila_4_0"[dir=back]
+"Node4_1" [label= " ", fillcolor="#000041", group=4]
+ 
+{rank=same;};
+ 
+"Node_fila_4_0" [label="5"]
+"Node5_3" [label= " ", fillcolor="#000000", group=5]
+"Node5_10" [label= " ", fillcolor="#000000", group=5]
+ 
+{rank=same;"Node_fila_4_0";"Node5_0";"Node5_1";"Node5_2";"Node5_3";"Node5_4";"Node5_5";"Node5_6";"Node5_7";"Node5_8";"Node5_9";"Node5_10";};
+ 
+ }
