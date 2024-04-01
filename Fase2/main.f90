@@ -1,6 +1,8 @@
 program main
     use json_module
     use matrix_m
+    use abb_m
+    use lista_album
 
     implicit none
     
@@ -8,27 +10,32 @@ program main
     character(len=10) :: admin
     character(len=10) :: password
     
-    ! Declarar otras variables necesarias
+    ! Usuario y clave para el inicio de sesión
     character(len=10) :: usuario
     character(len=10) :: clave
 
     ! Lo que se va a usar para leer el Json
     type(json_file) :: json   ! Variable de tipo json_file
-    type(json_value), pointer :: listPointer, id_capa_pointer, pixelsPointer, attributePointer, pixelAttribute  ! punteros
+    type(json_value), pointer :: listPointer, id_capa_pointer, pixelsPointer, imgs_album_Pointer, attributePointer, pixelAttribute  ! punteros
     type(json_core) :: jsonc  ! Se declara una variable del tipo json_core para acceder a las funciones básicas de JSON
     integer:: id_capa, colum, row
 
-    character(:), allocatable  :: color
+    character(:), allocatable  :: color, album_js
     character(len=1000) :: filename
     character(len=1000) :: filename_capas
 
-    integer :: i, p, size, pixels  
+    integer :: i, p, size, pixels, num  
     logical :: found
 
     ! Matriz dispersa para las capas
     type(matrix) :: matriz_c
 
-    
+    ! Arbol BB
+    type(abb) :: tree_abb
+
+    ! Lista de albumes
+    type(lista_circular) :: lista_albumes
+
     integer :: opcion
 
     ! Asignar valores a las variables admin y password
@@ -91,7 +98,7 @@ contains
             print *, "============ Menu Cliente ============"
             print *, "Seleccione una opcion:"
             print *, "1. Visualizar reportes de las estructuras"
-            print *, "2. Navegación y gestión de imágenes"
+            print *, "2. Navegacion y gestión de imagenes"
             print *, "3. Carga masiva de capas"
             print *, "4. Carga masiva de imagenes"
             print *, "5. Cargar masiva de albumes"
@@ -107,11 +114,13 @@ contains
                     print *, "Cargando masivamente capas..."
 
                     call cargarCapas()
-                    call matriz_c%graficar("capas.dot")
+                    ! call matriz_c%graficar("capas.dot")
                 case(4)
                     print *, "Cargando masivamente imágenes..."
                 case(5)
-                    print *, "Cargando masivamente álbumes..."
+                    print *, "Cargando masivamente albumes..."
+
+                    call cargar_albumes()
                 case(6)
                     exit
                 case default
@@ -209,6 +218,8 @@ contains
             
             if (found) then 
                 call jsonc%get(attributePointer,id_capa)
+                ! Insertar capas en el arbol b
+                call tree_abb%insert(id_capa)
             end if
 
             call jsonc%get_child(id_capa_pointer, 'pixeles', attributePointer, found = found)
@@ -240,8 +251,79 @@ contains
             end do
         end do
 
+        !graficar el arbol b de capas
+        ! call tree_abb%graph("arbol_b")
+
         call json%destroy() ! Se finaliza el módulo JSON
 
     end subroutine cargarCapas
+
+
+    subroutine cargar_albumes()
+        implicit none
+
+        ! El usuario ingresa la direccion del JSON
+        print *, "=== Ingrese la direccion del archivo JSON de clientes: ==="
+        ! read(*, '(A1000)') filename_capas !Ingresar direccion de archivo JSON
+        filename_capas= "C:\Users\elian\OneDrive\Documentos\USAC_2024\EDD_proyectos\&
+        EDD_PROYECTO_202044192\Fase2\albumes.json"
+
+        call json%initialize()    ! Se inicializa el módulo JSON
+        call json%load(filename=trim(filename_capas))  !se carga el archivo de entrada Json
+        ! call json%print()         ! Imprimir
+        print *, "Archivo de albumes cargado exitosamente."
+                    
+        call json%info('',n_children=size)
+
+        call json%get_core(jsonc)               ! Se obtiene el núcleo JSON para acceder a sus funciones básicas
+        call json%get('', listPointer, found)
+
+        ! print *, "Nombres detectados:"
+        do i = 1, size                          ! Se inicia un bucle sobre el número de elementos en el JSON
+            call jsonc%get_child(listPointer, i, id_capa_pointer, found = found)  ! Se obtiene el i-ésimo hijo de listPointer
+            call jsonc%get_child(id_capa_pointer, 'nombre_album', attributePointer, found = found)  ! Se obtiene el valor asociado con la clave 'nombrdel hijo actual
+            
+            if (found) then 
+                call jsonc%get(attributePointer,album_js)
+                ! Insertar capas en el arbol b
+                print *, "Album: ", album_js
+            end if
+
+            call jsonc%get_child(id_capa_pointer, 'imgs', attributePointer, found = found)       
+            
+
+                if (found) then
+                    call jsonc%info(attributePointer, n_children=pixels)  ! Obtiene el número de elementos en el array 'imgs'
+
+                    do p = 1, pixels
+                        call jsonc%get_child(attributePointer, p, pixelsPointer, found = found)  ! Obtiene el p-ésimo elemento del array 'imgs'
+
+                        if (found) then
+                            call jsonc%get(pixelsPointer, num)  ! Lee el número
+                            print *, "Número: ", num
+                        end if
+                    end do
+                end if
+        end do
+        !     call jsonc%info(attributePointer, n_children=pixels)
+
+        !     do p = 1, pixels
+        !         call jsonc%get_child(attributePointer, p, pixelsPointer, found = found)
+                
+        !         if (found) then
+
+        !             call jsonc%get(pixelsPointer, "color", pixelAttribute, found= found)
+        !             if (found)then 
+        !                 call jsonc%get(pixelAttribute, color)
+        !             end if
+                    
+        !         end if
+
+        !     end do
+        ! end do
+
+        call json%destroy() ! Se finaliza el módulo JSON
+
+    end subroutine cargar_albumes
 
 end program main

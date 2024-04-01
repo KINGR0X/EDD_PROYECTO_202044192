@@ -1,0 +1,28 @@
+ digraph albumes {
+     node [shape=box, style=filled, color=blue, fillcolor=cornflowerblue];
+     "Node           1 " [label="Album 1"];
+     "Node           1 " -> "Node           2 ";
+     "Node           1 " -> "Node           3 ";
+     "Node_img           2 " [label="           1 "];
+     "Node_img           2 " -> "Node           1 ";
+     "Node_img           3 " [label="           3 "];
+     "Node_img           3 " -> "Node_img           2 ";
+     "Node_img           4 " [label="           5 "];
+     "Node_img           4 " -> "Node_img           3 ";
+     "Node           2 " [label="Album 2"];
+     "Node           2 " -> "Node           3 ";
+     "Node           2 " -> "Node           1 ";
+     "Node_img           6 " [label="           2 "];
+     "Node_img           6 " -> "Node           2 ";
+     "Node_img           7 " [label="           5 "];
+     "Node_img           7 " -> "Node_img           6 ";
+     "Node           3 " [label="Album 3"];
+     "Node           3 " -> "Node           1 ";
+     "Node           3 " -> "Node           2 ";
+ 
+{rank=same;     "Node           1 ";
+     "Node           2 ";
+     "Node           3 ";
+};
+ 
+ }

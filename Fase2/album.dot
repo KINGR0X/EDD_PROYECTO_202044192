@@ -1,0 +1,12 @@
+ digraph Pila {
+     node [shape=box, style=filled, color=black, fillcolor=pink];
+ "Node           1 "[label = "Album 1"];
+ "Node00           0 "[label = "           5 "];
+     "Node00           0 " -> "Node00           1 ";
+ "Node00           1 "[label = "           2 "];
+     "Node00           1 " -> "Node00           2 ";
+     "Node           1 " -> "Node           2 ";
+ "Node           2 "[label = "Album 2"];
+     "Node           2 " -> "Node           3 ";
+ "Node           3 "[label = "Album 3"];
+ }
