@@ -50,7 +50,8 @@ contains
 
         ! Rehash si la tabla está ocupada al 70%
         if (total_ocupado >= (SIZE+1) * 0.7) then
-            SIZE = SIZE * 2
+            SIZE = (SIZE+1) * 2
+            SIZE= SIZE - 1
             allocate(new_table(0:SIZE))
             new_table = 0
 
@@ -166,21 +167,40 @@ program main
     telefono = 12345677
     call insert(1234567891011_16, nombre, apellido, genero, direccion, telefono)  ! posición 6,  no se usa rehash
 
-    ! nombre = 'Pedro'
-    ! apellido = 'Lopez'
-    ! call insert(00000000000013_16, nombre, apellido)  ! posición 0,  contador_colisiones = 0
+    nombre = 'Pedro'
+    apellido = 'Lopez'
+    genero = "Femenino"
+    direccion = "6 calle 8-40 Villa Nueva"
+    telefono = 12345677
+    call insert(00000000000013_16, nombre, apellido, genero, direccion, telefono)  ! posición 0,  contador_colisiones = 0
 
-    ! nombre = 'Ana'
-    ! apellido = 'Martinez'
-    ! call insert(00000000000013_16, nombre, apellido)  ! posición 5,  contador_colisiones = 1
+    nombre = 'Ana'
+    apellido = 'Martinez'
+    genero = "Femenino"
+    direccion = "6 calle 8-40 Villa Nueva"
+    telefono = 12345677
+    call insert(00000000000013_16, nombre, apellido, genero, direccion, telefono)  ! posición 5,  contador_colisiones = 1
 
-    ! nombre = 'Laura'
-    ! apellido = 'Sanchez'
-    ! call insert(9921354345345_16, nombre, apellido)
+    nombre = 'Laura'
+    apellido = 'Sanchez'
+    genero = "Femenino"
+    direccion = "6 calle 8-40 Villa Nueva"
+    telefono = 12345677
+    call insert(9921354345345_16, nombre, apellido, genero, direccion, telefono)
 
-    ! nombre = 'Carlos'
-    ! apellido = 'Ruiz'
-    ! call insert(7621354345345_16, nombre, apellido)
+    nombre = 'Carlos'
+    apellido = 'Ruiz'
+    genero = "Femenino"
+    direccion = "6 calle 8-40 Villa Nueva"
+    telefono = 12345677
+    call insert(7621354345345_16, nombre, apellido, genero, direccion, telefono)
+
+    nombre = 'Carlos 2'
+    apellido = 'Ruiz'
+    genero = "Masculino"
+    direccion = "6 calle 8-40 Villa Nueva"
+    telefono = 12345677
+    call insert(7621354345346_16, nombre, apellido, genero, direccion, telefono)
 
     call print()
 
