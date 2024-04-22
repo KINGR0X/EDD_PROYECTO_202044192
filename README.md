@@ -25,3 +25,18 @@ imágenes hechas con pixeles, cada capa contendrá la información de los distin
 píxeles y al colocar una capa sobre otra estas irán formando una imagen más
 completa.
 El sistema es capaz de generar imagen seleccionando las capas deseadas
+
+## Fase 3
+
+Pixel Print Studio, una empresa especializada en servicios de impresión, ha expandido su
+presencia a lo largo del país mediante la apertura de múltiples sucursales. Esta expansión
+ha generado la necesidad de realizar mantenimiento y reparaciones periódicas en todas las
+tiendas, asegurando así el óptimo funcionamiento de cada una de ellas. Para abordar esta
+necesidad, se propone el desarrollo de un Sistema de Gestión de Mantenimiento.
+El Sistema de Gestión de Mantenimiento tiene como objetivo principal coordinar y registrar
+las actividades de mantenimiento y reparación realizadas en cada sucursal de Pixel Print
+Studio. Para lograr esto, el sistema mantendrá un registro detallado de los técnicos
+asignados a cada tarea de mantenimiento, así como los costos asociados con cada
+intervención. Dada la naturaleza sensible de los datos involucrados, se pondrá especial
+énfasis en garantizar la seguridad y confiabilidad de la información almacenada en el
+sistema.

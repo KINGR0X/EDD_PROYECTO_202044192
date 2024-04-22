@@ -1,0 +1,18 @@
+[
+  {
+    "id": "3746582726365",
+    "nombre": "Juan Pablo",
+    "apellido": "Gonzalez Carrillo",
+    "genero": "Maculino",
+    "direccion": "8 calle 3-45 zona 1",
+    "telefono": 12345678
+  },
+  {
+    "id": "1234567891011",
+    "nombre": "maria Jose",
+    "apellido": "Portillo Velazquez",
+    "genero": "Femenino",
+    "direccion": "6 calle 8-40 Villa Nueva",
+    "telefono": 12345677
+  }
+]

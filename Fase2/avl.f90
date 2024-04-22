@@ -5,11 +5,13 @@ module avl_m
     private
 
     type :: node
+        integer, allocatable :: capas(:)
         integer :: value
         integer :: height = 1
         type(node), pointer :: right => null()
         type(node), pointer :: left => null()
-        type(abb), pointer :: bb_tree => null()
+        type(abb), pointer :: abb_tree => null()
+        
 
     end type node
 
@@ -21,16 +23,25 @@ module avl_m
         procedure :: delete
         procedure :: preorder
         procedure :: graph
+        procedure :: insertAtNodeValue
     end type avl
 
 contains
 
     !Subrutinas del tipo avl
-    subroutine insert(self, val)
+    ! subroutine insert(self, val)
+    !     class(avl), intent(inout) :: self
+    !     integer, intent(in) :: val
+
+    !     call insertRec(self%root, val)
+    ! end subroutine insert
+
+    subroutine insert(self, val, capas)
         class(avl), intent(inout) :: self
         integer, intent(in) :: val
+        integer, intent(in) :: capas(:)
 
-        call insertRec(self%root, val)
+        call insertRec(self%root, val, capas)
     end subroutine insert
 
     subroutine delete(self, val)
@@ -75,19 +86,19 @@ contains
     end subroutine graph
 
     !Subrutinas de apoyo
-    recursive subroutine insertRec(root, val)
+    recursive subroutine insertRec(root, val, capas)
         type(node), pointer, intent(inout) :: root
         integer, intent(in) :: val
+        integer, intent(in) :: capas(:)
 
         if(.not. associated(root)) then
             allocate(root)
-            root = node(value=val)
-
+            root = node(value=val, capas=capas)
+            !allocate(root%abb_tree) !Creo el arbol binario de busqueda
         else if(val < root%value) then
-            call insertRec(root%left, val)
-
+            call insertRec(root%left, val, capas)
         else if(val > root%value) then
-            call insertRec(root%right, val)
+            call insertRec(root%right, val, capas)
         end if
 
         root%height = maxHeight(getHeight(root%left), getHeight(root%right)) + 1
@@ -96,7 +107,6 @@ contains
             if(getBalance(root%right) < 0) then
                 root%right => rightRotation(root%right)
                 root => leftRotation(root)
-
             else
                 root => leftRotation(root)
             end if
@@ -106,7 +116,6 @@ contains
             if(getBalance(root%left) > 0) then
                 root%left => leftRotation(root%left)
                 root => rightRotation(root)
-            
             else
                 root => rightRotation(root)
             end if
@@ -248,6 +257,7 @@ contains
 
         if(associated(root)) then
             print *, root%value
+            print *, root%capas
             call preorderRec(root%left)
             call preorderRec(root%right)
         end if
@@ -274,39 +284,79 @@ contains
             end if
             call printRec(root%left, left, io)
             call printRec(root%right, right, io)
+
+            ! if (associated(root%abb_tree)) then
+            !     call printRec_abb(root%abb_tree%root, generate_uuid(), io)
+            ! end if
         end if
     end subroutine printRec
 
+
+    recursive subroutine insertAtNodeValue(self, val_avl, val_abb)
+        class(avl), intent(inout) :: self
+        integer, intent(in) :: val_avl
+        integer, intent(in) :: val_abb
+
+        type(node), pointer :: found_node
+        found_node => findNodeByValue(self%root, val_avl)
+
+        if (associated(found_node)) then
+            call found_node%abb_tree%insert(val_abb)
+        else
+            print *, "Error: No se encontró un nodo AVL con el valor especificado."
+        end if
+    end subroutine insertAtNodeValue
+
+    recursive function findNodeByValue(node_avl, val) result(found_node)
+        type(node), pointer :: node_avl
+        integer, intent(in) :: val
+        type(node), pointer :: found_node
+
+        if (.not. associated(node_avl)) then
+            found_node => null()
+            return
+        end if
+
+        if (node_avl%value == val) then
+            found_node => node_avl
+            return
+        elseif (val < node_avl%value) then
+            found_node => findNodeByValue(node_avl%left, val)
+        else
+            found_node => findNodeByValue(node_avl%right, val)
+        end if
+    end function findNodeByValue
+
+
 end module avl_m
 
-program main
-    use avl_m
-    implicit none
+! program main
+!     use avl_m
+!     implicit none
     
-    type(avl) :: tree
-    call tree%insert(20)
-    call tree%insert(8)
-    call tree%insert(3)
-    call tree%insert(1)
-    call tree%insert(0)
-    call tree%insert(15)
-    call tree%insert(30)
-    call tree%insert(48)
-    call tree%insert(26)
-    call tree%insert(10)
-    call tree%insert(7)
-    call tree%insert(5)
-    call tree%insert(60)
-    call tree%insert(19)
-    call tree%insert(11)
-    call tree%insert(21)
-    call tree%insert(3)
+!     type(avl) :: tree
 
-    ! call tree%delete(11)
-    ! call tree%delete(10)
-    ! call tree%delete(19)
+!     call tree%insert(0,[1,2,3])
+!     call tree%insert(15,[10,9,8])
+!     ! call tree%insert(30)
+!     ! call tree%insert(48)
+!     ! call tree%insert(26)
+!     ! call tree%insert(10)
+!     ! call tree%insert(7)
+!     ! call tree%insert(5)
+!     ! call tree%insert(60)
+!     ! call tree%insert(19)
+!     ! call tree%insert(11)
+!     ! call tree%insert(21)
+!     ! call tree%insert(3)
 
-    
-    call tree%preorder()
-    call tree%graph()
-end program main
+!     ! call tree%delete(11)
+!     ! call tree%delete(10)
+!     ! call tree%delete(19)
+
+!     ! call tree%insertAtNodeValue(20, 2)
+!     ! call tree%insertAtNodeValue(20, 5)
+
+!     call tree%preorder()
+!     call tree%graph()
+! end program main

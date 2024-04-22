@@ -1,0 +1,24 @@
+ digraph clientes_f2 {
+     node [shape=box, style=filled, color=blue, fillcolor=gold];
+     "Node           1 " [label="f2                                                                                                  \n DPI =2999062130101\n password =321                                                                                                 "];
+     "Node           1 " -> "Node           2 ";
+     "Node           2 " [label="AUX EDD2\n DPI =3999062130101\n password =2edd1s2024"];
+     "Node           2 " -> "Node           3 ";
+     "Node           3 " [label="AUX EDD3\n DPI =4999062130101\n password =3edd1s2024"];
+     "Node           3 " -> "Node           4 ";
+     "Node           4 " [label="AUX EDD4\n DPI =4999062130101\n password =4edd1s2024"];
+     "Node           4 " -> "Node           5 ";
+     "Node           5 " [label="AUX EDD5\n DPI =6999062130101\n password =5edd1s2024"];
+     "Node           5 " -> "Node           6 ";
+     "Node           6 " [label="AUX EDD6\n DPI =7999062130101\n password =6edd1s2024"];
+     "Node           6 " -> "Node           7 ";
+     "Node           7 " [label="AUX EDD7\n DPI =8999062130101\n password =7edd1s2024"];
+     "Node           7 " -> "Node           8 ";
+     "Node           8 " [label="AUX EDD8\n DPI =9999062130101\n password =8edd1s2024"];
+     "Node           8 " -> "Node           9 ";
+     "Node           9 " [label="AUX EDD9\n DPI =2999062130101\n password =9edd1s2024"];
+     "Node           9 " -> "Node          10 ";
+     "Node          10 " [label="AUX EDD10\n DPI =2299062130101\n password =10edd1s2024"];
+     "Node          10 " -> "Node          11 ";
+     "Node          11 " [label="Calificacion                                                                                        \n DPI =9999999999999                                                                                       \n password =123                                                                                                 "];
+ }

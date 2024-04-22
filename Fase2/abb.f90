@@ -19,8 +19,90 @@ module abb_m
         procedure :: inorder
         procedure :: posorder
         procedure :: graph
+        procedure :: preorder_get
+        procedure :: inorder_get
+        procedure :: postorder_get
     end type abb
 contains
+
+    !==========================================
+    function postorder_get(self) result(values)
+        class(abb), intent(in) :: self
+        integer, dimension(:), allocatable :: values
+
+        allocate(values(0))
+        
+        call postordenRec_get(self%root,values)
+    end function postorder_get
+
+    function inorder_get(self) result(values)
+        class(abb), intent(in) :: self
+        integer, dimension(:), allocatable :: values
+
+        allocate(values(0))
+        
+        call inordenRec_get(self%root, values)
+    end function inorder_get
+
+
+    recursive subroutine inordenRec_get(root,values)
+        type(node), pointer, intent(in) :: root
+        integer, dimension(:), allocatable, intent(inout) :: values
+
+        if(associated(root)) then
+            if (.not. allocated(values)) then
+                allocate(values(1))
+            else
+                values = [values, root%value]
+            end if
+            call inordenRec_get(root%left,values)
+            call inordenRec_get(root%right,values)
+        end if
+    end subroutine inordenRec_get
+    
+
+    function preorder_get(self) result(values)
+        class(abb), intent(in) :: self
+        integer, dimension(:), allocatable :: values
+
+        ! Inicializar el array values como un arreglo vacío
+        allocate(values(0))
+
+        ! Llamar a la función recursiva para obtener los valores en preorden
+        call preorderRec_get(self%root, values)
+    end function preorder_get
+
+    recursive subroutine preorderRec_get(root, values)
+        type(node), pointer, intent(in) :: root
+        integer, dimension(:), allocatable, intent(inout) :: values
+
+        if(associated(root)) then
+            if (.not. allocated(values)) then
+                allocate(values(1))
+            else
+                values = [values, root%value]
+            end if
+            call preorderRec_get(root%left, values)
+            call preorderRec_get(root%right, values)
+        end if
+    end subroutine preorderRec_get
+
+    recursive subroutine postordenRec_get(root,values)
+        type(node), pointer, intent(in) :: root
+        integer, dimension(:), allocatable, intent(inout) :: values
+
+        if(associated(root)) then
+            if (.not. allocated(values)) then
+                allocate(values(1))
+            else
+                values = [values, root%value]
+            end if
+            call postordenRec_get(root%left,values)
+            call postordenRec_get(root%right,values)
+        end if
+    end subroutine postordenRec_get
+
+
     !Subrutinas del tipo abb
     subroutine insert(self, val)
         class(abb), intent(inout) :: self
@@ -120,6 +202,7 @@ contains
         call inordenRec(self%root)
     end subroutine inorder
 
+
     subroutine posorder(self)
         class(abb), intent(in) :: self
         
@@ -137,14 +220,14 @@ contains
     end subroutine preorderRec
 
     recursive subroutine inordenRec(root)
-    type(node), pointer, intent(in) :: root
+        type(node), pointer, intent(in) :: root
 
-    if(associated(root)) then
-        call inordenRec(root%left)
-        print *, root%value
-        call inordenRec(root%right)
-    end if
-end subroutine inordenRec
+        if(associated(root)) then
+            call inordenRec(root%left)
+            print *, root%value
+            call inordenRec(root%right)
+        end if
+    end subroutine inordenRec
 
     recursive subroutine posordenRec(root)
     type(node), pointer, intent(in) :: root
@@ -222,6 +305,7 @@ end module abb_m
     
 !     type(abb) :: tree
 !     integer :: del
+!     integer, dimension(:), allocatable :: values
 
 !     call tree%insert(20)
 !     call tree%insert(8)
@@ -241,9 +325,13 @@ end module abb_m
 !     call tree%insert(21)
 !     call tree%insert(3)
 
+!     values = tree%postorder_get()
 
-!     del = 30
-!     call tree%delete(del)
+!     print *, "Valores en inorder: ", values
+
+
+!     ! del = 30
+!     ! call tree%delete(del)
     
 !     ! print *, "Escribiendo en preorden: "
 !     ! call tree%preorder()
@@ -254,5 +342,5 @@ end module abb_m
 !     ! print *, "Escribiendo en posorden: "
 !     ! call tree%posorder()
 
-!     call tree%graph("arbol_b")
+!     ! call tree%graph("arbol_b")
 ! end program main

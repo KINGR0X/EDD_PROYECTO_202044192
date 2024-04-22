@@ -1,0 +1,6 @@
+ digraph clientes_f2 {
+     node [shape=box, style=filled, color=blue, fillcolor=gold];
+     "Node           1 " [label="AUX EDD\n DPI =1234567890123\n password =edd1s2022"];
+     "Node           1 " -> "Node           2 ";
+     "Node           2 " [label="cliente 2\n DPI =6745567890123\n password =edd1s2022"];
+ }

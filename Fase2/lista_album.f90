@@ -361,9 +361,9 @@ contains
         close(unit)
     
         ! Generar el archivo PNG utilizando Graphviz
-        call system('dot -Tpdf ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.pdf')
+        call system('dot -Tpng ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.png')
     
-        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.pdf'
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.png'
 
     end subroutine graficar
 
