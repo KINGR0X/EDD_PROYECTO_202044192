@@ -70,7 +70,6 @@ contains
             print *, 'Nueva tabla de tamaño ', SIZE
         end if
 
-    
         ! Calcular el índice usando la función de hash
         hash = modulo(key, SIZE+1)
 
@@ -93,9 +92,9 @@ contains
 
             ! se ejecuta mientras insertado sea 0
             do while (bool_insertado == 0)
-                print *, 'Contador colisiones= ', contador_colisiones
+                print *, 'XXX Contador colisiones= ', contador_colisiones
 
-                index = (modulo(key, SIZE)) * contador_colisiones
+                index = modulo(((modulo(key, 8)) * contador_colisiones), SIZE+1)
                 
                 if (table(index) == 0) then
                     registros(index)%numero = key
@@ -181,26 +180,33 @@ program main
     telefono = 12345677
     call insert(00000000000013_16, nombre, apellido, genero, direccion, telefono)  ! posición 5,  contador_colisiones = 1
 
-    nombre = 'Laura'
-    apellido = 'Sanchez'
+    nombre = 'Numero trece'
+    apellido = 'Martinez'
     genero = "Femenino"
     direccion = "6 calle 8-40 Villa Nueva"
     telefono = 12345677
-    call insert(9921354345345_16, nombre, apellido, genero, direccion, telefono)
+    call insert(00000000000013_16, nombre, apellido, genero, direccion, telefono)  ! posición 6,  contador_colisiones = 1
 
-    nombre = 'Carlos'
-    apellido = 'Ruiz'
-    genero = "Femenino"
-    direccion = "6 calle 8-40 Villa Nueva"
-    telefono = 12345677
-    call insert(7621354345345_16, nombre, apellido, genero, direccion, telefono)
+    ! nombre = 'Laura'
+    ! apellido = 'Sanchez'
+    ! genero = "Femenino"
+    ! direccion = "6 calle 8-40 Villa Nueva"
+    ! telefono = 12345677
+    ! call insert(9921354345345_16, nombre, apellido, genero, direccion, telefono)
 
-    nombre = 'Carlos 2'
-    apellido = 'Ruiz'
-    genero = "Masculino"
-    direccion = "6 calle 8-40 Villa Nueva"
-    telefono = 12345677
-    call insert(7621354345346_16, nombre, apellido, genero, direccion, telefono)
+    ! nombre = 'Carlos'
+    ! apellido = 'Ruiz'
+    ! genero = "Femenino"
+    ! direccion = "6 calle 8-40 Villa Nueva"
+    ! telefono = 12345677
+    ! call insert(7621354345345_16, nombre, apellido, genero, direccion, telefono)
+
+    ! nombre = 'Carlos 2'
+    ! apellido = 'Ruiz'
+    ! genero = "Masculino"
+    ! direccion = "6 calle 8-40 Villa Nueva"
+    ! telefono = 12345677
+    ! call insert(7621354345346_16, nombre, apellido, genero, direccion, telefono)
 
     call print()
 
